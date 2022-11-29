@@ -54,8 +54,8 @@ public class ConfigPage {
         }
 
         try {
-            ProcessMiningService processMiningService = new ProcessMiningService();
-            DataMining dataMining = processMiningService.GetContentProcess(serverRequest.getFilePath(), serverRequest.getDelimiter());
+            DataProcessingService dataProcessingService = new DataProcessingService();
+            DataMining dataMining = dataProcessingService.GetContentProcess(serverRequest.getFilePath(), serverRequest.getDelimiter());
             ServerECM serverECM = new ServerECM();
             serverECM.setServer("baw.malek-jabri-s-account.cloud");
             serverECM.setPassword("!Filenet1!");
@@ -92,8 +92,8 @@ public class ConfigPage {
             return "connectToServer";
         }
         try {
-            ProcessMiningService processMiningService = new ProcessMiningService();
-            DataMining dataMining = processMiningService.GetContentProcess(serverRequest.getFilePath(), serverRequest.getDelimiter());
+            DataProcessingService dataProcessingService = new DataProcessingService();
+            DataMining dataMining = dataProcessingService.GetContentProcess(serverRequest.getFilePath(), serverRequest.getDelimiter());
             CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
             caseHistory.init(dataMining, "TaskEvent");
             dataMining = null;
@@ -125,8 +125,8 @@ public class ConfigPage {
     public String configuration(HttpSession session, Model model, ConfigurationRequest configurationRequest) {
         ServerRequest serverRequest = (ServerRequest) session.getAttribute("ServerRequest");
         try {
-            ProcessMiningService processMiningService = new ProcessMiningService();
-            DataMining dataMining = processMiningService.GetContentProcess(serverRequest.getFilePath(), serverRequest.getDelimiter());
+            DataProcessingService dataProcessingService = new DataProcessingService();
+            DataMining dataMining = dataProcessingService.GetContentProcess(serverRequest.getFilePath(), serverRequest.getDelimiter());
             CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
             dataMining = null;
             Set<String> caseTypes = new HashSet<>();
@@ -134,7 +134,7 @@ public class ConfigPage {
                 caseTypes.add(event.getCaseType().replace("{", "").replace("}", ""));
             });
             logger.info("Number of case type id : " + caseTypes.size());
-            processMiningService.save(caseHistory, path + "cleaned" + ".csv");
+            dataProcessingService.save(caseHistory, path + "cleaned" + ".csv");
         } catch (Exception e) {
 
         }

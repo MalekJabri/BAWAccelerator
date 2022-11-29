@@ -1,64 +1,23 @@
 package org.mj.process.service;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.mj.process.model.CaseEvent;
-import org.mj.process.model.CaseHistory;
-import org.mj.process.model.DataMining;
+import org.openapitools.client.ApiClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
-
+@Service
 public class ProcessMiningService {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static Logger logger = Logger.getLogger(ProcessMiningService.class.getName());
-
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         ProcessMiningService processMiningService = new ProcessMiningService();
-        HashMap<String, CaseEvent> maps = new HashMap<>();
-        String path = "/Users/jabrimalek/Project/lalux/history.csv";
-        String pathOut = "/Users/jabrimalek/Project/lalux/compiled.csv";
-        String delimiter = ";";
-        DataMining dataMining = processMiningService.GetContentProcess(path, delimiter);
-        String levelEvent = "StepEvent";
-        CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
-        caseHistory.init(dataMining, levelEvent);
-        // caseHistory.cleanCompletion();
-        processMiningService.save(caseHistory, pathOut);
+        processMiningService.connectToProcessMining();
     }
 
-    public DataMining GetContentProcess(String path, String delimiter) throws Exception {
-        DataMining dataMining = new DataMining();
-        BufferedReader brTest = new BufferedReader(new FileReader(path));
-        String text = brTest.readLine();
-        brTest.close();
-        String[] strArray = text.split(delimiter + "");
-        Reader in = new FileReader(path);
-        dataMining.setRecords(CSVFormat.EXCEL.withDelimiter(delimiter.charAt(0)).withSkipHeaderRecord().withHeader(strArray).parse(in));
-        dataMining.setHeaders(strArray);
-        return dataMining;
-    }
-
-    public void save(CaseHistory caseHistory, String path) throws IOException {
-        logger.info("Start Writing the case event to the path " + path);
-        AtomicInteger count = new AtomicInteger();
-        FileWriter out = new FileWriter(path);
-        try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.EXCEL.withDelimiter(';')
-                .withHeader(caseHistory.getHeaders()))) {
-            caseHistory.getEvents().forEach((id, caseEvent) -> {
-                try {
-                    printer.printRecord(caseEvent.getValues());
-                    count.getAndIncrement();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            printer.flush();
-        }
-        logger.info("The file " + path + " has been saved and contains " + count + " records");
-
+    public void connectToProcessMining() {
+        logger.info("Connect to Process mining using the following user ");
+        ApiClient apiClient = new ApiClient();
+        apiClient.setBasePath("");
     }
 
 }

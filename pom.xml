@@ -55,7 +55,11 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
             <version>2.6.7</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.ibm.mj</groupId>
+            <artifactId>processMining</artifactId>
+            <version>1.13.1</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
