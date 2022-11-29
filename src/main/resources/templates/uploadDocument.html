@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <link href="/favicon.ico" rel="icon">
+
+    <link href="/normalize/normalize.min.css" rel="stylesheet">
+    <link href="/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href='/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet'>
+    <link href="/style.css" rel="stylesheet">
+    <title>Process mining accelerator</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/form-validation.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container">
+    <div class="py-5 text-center">
+        <img alt="IBM" class="d-block mx-auto mb-4" height="72"
+             src="/assets/img/processmining.png"
+             width="72">
+        <h2>Configuration form</h2>
+        <p class="lead">Below is the form to configure process mining project.</p>
+    </div>
+    <div role="alert"
+         th:class="${classAlert}" th:style="${displayMessage}"><span th:text="${message}"></span></div>
+
+
+    <div class="container">
+        <div id="app">
+
+            <step-navigation :currentstep=1 :steps="steps"></step-navigation>
+
+
+            <div v-show="currentstep == 1">
+                <th:block th:if="${csvImport !=null }">
+                    <div class="col-md-12 order-md-1">
+                        <h4 class="mb-3">CSV file from the case history table </h4>
+                        <form enctype="multipart/form-data" method="post" th:action="@{/uploadFile}"
+                              th:object="${csvImport}">
+
+                            <div class="row">
+                                <div class="col-md-12 ">
+                                    <label for="filePath">File Path <span class="text-muted">(Local path of the csv file)</span></label>
+                                    <input class="form-control" id="filePath"
+                                           placeholder="/home/user/processmining/casehistory.csv"
+                                           th:field="${csvImport.filePath}"
+                                           type="text">
+                                    <div class="invalid-feedback">
+                                        Local path of the csv file.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 ">
+                                    <p></p>
+                                    <div style="text-align: center;">
+                                        <span> OR </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 ">
+                                    <div class="form-group">
+                                        <label for="document">File input</label>
+                                        <input aria-describedby="fileHelp" class="form-control-file" id="document"
+                                               name="document" type="file">
+                                        <small class="form-text text-muted" id="fileHelp">Upload a CSV (max 100
+                                            mb)</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="mb-4">
+                            <h4 class="mb-3">CSV Information</h4>
+                            <div class="=row">
+                                <div class="col-md-6 ">
+                                    <label for="Delimiter">Delimiter</label>
+                                    <input class="form-control" id="Delimiter" placeholder=";"
+                                           th:field="${csvImport.delimiter}" type="text"
+                                           value=";">
+                                </div>
+                            </div>
+                            <hr class="mb-4">
+                            <h4 class="mb-3">Cleaning</h4>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" id="cleanDate"
+                                               th:field="${csvImport.cleanDate}" type="checkbox">
+                                        <label class="custom-control-label" for="cleanDate">Clean Date</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" id="cleanIDAttribute"
+                                               th:field="${csvImport.cleanIDAttribute}" type="checkbox">
+                                        <label class="custom-control-label" for="cleanIDAttribute">clean ID
+                                            Attribute</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <hr class="mb-4">
+                            <h4 class="mb-3">Transform </h4>
+                            <div class="=row">
+                                <div class="col-md-6 ">
+                                    <label for="DateFormat">DateFormat</label>
+                                    <input class="form-control" id="DateFormat" placeholder="dd/MM/yyyy hh:mm:ss"
+                                           th:field="${csvImport.dateFormat}" type="text"
+                                           value="">
+                                </div>
+                            </div>
+                            <hr class="mb-4">
+                            <h4 class="mb-3">Add additional information</h4>
+                            <div class="=row">
+                                <div class="col-md-6 ">
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" id="addInformation"
+                                               th:field="${csvImport.addInformation}" type="checkbox">
+                                        <label class="custom-control-label" for="addInformation">Retrieve additional
+                                            case properties</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mb-4">
+                            <div class="row">
+                                <div class="col-md-12 ">
+                                    <button class="btn btn-primary" type="submit">Upload & Analyse the file</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </th:block>
+            </div>
+
+            <step :currentstep="currentstep" :key="step.id" :step="step" :stepcount="steps.length"
+                  @step-change="stepChanged"
+                  v-for="step in steps">
+            </step>
+
+            <script id="step-navigation-template" type="x-template">
+                <ol class="step-indicator">
+                    <li v-for="step in steps" is="step-navigation-step" :key="step.id" :step="step"
+                        :currentstep="currentstep">
+                    </li>
+                </ol>
+            </script>
+
+            <script id="step-navigation-step-template" type="x-template">
+                <li :class="indicatorclass">
+                    <div class="step"><i :class="step.icon_class"></i></div>
+                    <div class="caption hidden-xs hidden-sm">Step <span v-text="step.id"></span>: <span
+                            v-text="step.title"></span></div>
+                </li>
+            </script>
+        </div>
+    </div>
+
+    <footer class="my-5 pt-5 text-muted text-center text-small">
+        <p class="mb-1">&copy; 2022-2023 IBM</p>
+        <ul class="list-inline">
+            <li class="list-inline-item"><a href="#">Privacy</a></li>
+            <li class="list-inline-item"><a href="#">Terms</a></li>
+            <li class="list-inline-item"><a href="#">Support</a></li>
+        </ul>
+    </footer>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src='/vue/2.4.4/vue.js'></script>
+<script src="/script.js"></script>
+<script>window.jQuery || document.write('<script src="/assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+<script src="/assets/js/vendor/popper.min.js"></script>
+<script src="/dist/js/bootstrap.min.js"></script>
+<script src="/assets/js/vendor/holder.min.js"></script>
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+        'use strict';
+
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+</body>
+</html>
