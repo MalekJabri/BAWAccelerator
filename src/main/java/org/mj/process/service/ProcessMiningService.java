@@ -17,7 +17,9 @@ public class ProcessMiningService {
     public void connectToProcessMining() {
         logger.info("Connect to Process mining using the following user ");
         ApiClient apiClient = new ApiClient();
-        apiClient.setBasePath("");
+        apiClient.setBasePath("https://raffaello.my-invenio.com");
+        
+
     }
 
 }
