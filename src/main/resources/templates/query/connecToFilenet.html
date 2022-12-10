@@ -37,7 +37,7 @@
     <div class="container">
         <div id="app">
             <step-navigation :currentstep=2 :steps="steps"></step-navigation>
-            <form method="post" th:object="${connectionRequest}" th:action="@{/testConnection}"  enctype="multipart/form-data">
+            <form method="post" th:object="${connectionRequest}" th:action="@{/createQuery}"  enctype="multipart/form-data">
             <div class="col-md-12 order-md-1">
                     <h4 class="mb-3">Filenet server</h4>
                         <div class="row">
@@ -87,41 +87,9 @@
                         </div>
 
                 </div>
-                <hr class="mb-4">
-            <div class="col-md-12 order-md-1">
-                <h4 class="mb-3">Process mining server</h4>
-                    <div class="row">
 
-                        <div class="col-md-6 mb-3">
-                            <label for="username">UserName</label>
-                            <input class="form-control" id="userID" placeholder="admin" th:field="${connectionRequest.processMiningServerRequest.userID}" required type="text">
-                            <div class="invalid-feedback">
-                                Valid first name is required.
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="password">Password</label>
-                            <input class="form-control" id="apiKey" th:field="${connectionRequest.processMiningServerRequest.apikey}"  required type="text">
-                            <div class="invalid-feedback">
-                                Valid last name is required.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 ">
-                            <label for="url">URL<span class="text-muted">(ip/hostname)</span></label>
-                            <input class="form-control" id="url" placeholder="url server" th:field="${connectionRequest.processMiningServerRequest.url}" required
-                                   type="text">
-                            <div class="invalid-feedback">
-                                Please enter url for process mining server.
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="mb-3">
-                    <button type="submit" class="btn btn-primary" >Next Step</button>
-
-                </div>
-
+                <hr class="mb-3">
+                <button type="submit" class="btn btn-primary" onclick="showSpinner()" > <span class="fa-spinner" role="status" id="spinner"  ></span> Next Step</button>
             </form>
             <step :currentstep="currentstep" :key="step.id" :step="step" :stepcount="steps.length"
                   @step-change="stepChanged"
@@ -170,12 +138,19 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src='/vue/2.4.4/vue.js'></script>
-<script src="/configScript.js"></script>
-<script src="/toolsScript.js"></script>
+<script src="/queryScript.js"></script>
 <script>window.jQuery || document.write('<script src="/assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
 <script src="/assets/js/vendor/popper.min.js"></script>
 <script src="/dist/js/bootstrap.min.js"></script>
 <script src="/assets/js/vendor/holder.min.js"></script>
+<script >
+    function showSpinner() {
+        console.log("Start to show  Spinner !!");
+        console.log(document.getElementById("spinner"));
+        document.getElementById("spinner").style.display = "inline";
+        console.log("end to show  Spinner !!");
+    }
+</script>
 <script>
     // Example starter JavaScript for disabling form submissions if there are invalid fields
     (function () {

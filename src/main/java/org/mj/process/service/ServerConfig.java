@@ -4,7 +4,7 @@ import com.filenet.api.core.ObjectStore;
 import com.ibm.mj.core.p8Connection.ConnectionTool;
 import com.ibm.mj.core.properties.MappingFieldsTool;
 import lombok.Data;
-import org.mj.process.model.ServerECM;
+import org.mj.process.model.FileNetServerRequest;
 
 import java.util.logging.Logger;
 
@@ -16,33 +16,33 @@ public class ServerConfig {
     private ConnectionTool connectionTool;
 
 
-    public static void main(String[] args) {
-        ServerConfig serverConfig = new ServerConfig("TOS", 3);
-        System.out.println( serverConfig.getOs().toString());
-    }
-
-    public ServerConfig(String objecStore, int config){
+    public ServerConfig(String objecStore, int config) {
         getconnection(objecStore, config);
     }
 
-    public ServerConfig(ServerECM config){
+    public ServerConfig(FileNetServerRequest config) {
         getconnection(config.getRepository(), config);
     }
 
-    public  void getconnection(String to, int config) {
+    public static void main(String[] args) {
+        ServerConfig serverConfig = new ServerConfig("TOS", 3);
+        System.out.println(serverConfig.getOs().toString());
+    }
+
+    public void getconnection(String to, int config) {
         logger.info("Start Connection based on the configuration " + config);
         MappingFieldsTool info = new MappingFieldsTool("connection.properties");
-        connectionTool  = new ConnectionTool();
+        connectionTool = new ConnectionTool();
         connectionTool.establishConnection(info.getMappingValue(config + "_user"), info.getMappingValue(config + "_password"), "FileNetP8WSI", "https://" + info.getMappingValue(config + "_host") + ":9443/wsi/FNCEWS40MTOM");
         os = connectionTool.fetchOS(to);
         logger.info("Start Connection based on the configuration " + info.getMappingValue(config + "_user") + " hosts " + info.getMappingValue(config + "_host"));
     }
 
-    public  void getconnection(String to, ServerECM config) {
+    public void getconnection(String to, FileNetServerRequest config) {
         logger.info("Start Connection based on the configuration " + config);
         connectionTool = new ConnectionTool();
         connectionTool.establishConnection(config.getUser(), config.getPassword(), "FileNetP8WSI", "http://" + config.getServer() + ":9080/wsi/FNCEWS40MTOM");
         os = connectionTool.fetchOS(to);
-        logger.info("Start Connection based on the configuration " + config.getUser() + " host: " + config.getServer() );
+        logger.info("Start Connection based on the configuration " + config.getUser() + " host: " + config.getServer());
     }
 }

@@ -101,24 +101,24 @@
                                     <div class="custom-control custom-checkbox">
                                         <input class="custom-control-input" id="cleanIDAttribute"
                                                th:field="${csvImport.cleanIDAttribute}" type="checkbox">
-                                        <label class="custom-control-label" for="cleanIDAttribute">clean ID
+                                        <label class="custom-control-label" for="cleanIDAttribute">Clean ID
                                             Attribute</label>
                                     </div>
                                 </div>
 
                             </div>
                             <hr class="mb-4">
-                            <h4 class="mb-3">Transform </h4>
+                            <h4 class="mb-3">Transform:</h4>
                             <div class="=row">
                                 <div class="col-md-6 ">
-                                    <label for="DateFormat">DateFormat</label>
+                                    <label for="DateFormat">Date format</label>
                                     <input class="form-control" id="DateFormat" placeholder="dd/MM/yyyy hh:mm:ss"
                                            th:field="${csvImport.dateFormat}" type="text"
                                            value="">
                                 </div>
                             </div>
                             <hr class="mb-4">
-                            <h4 class="mb-3">Add additional information</h4>
+                            <h4 class="mb-3">Add additional information:</h4>
                             <div class="=row">
                                 <div class="col-md-6 ">
                                     <div class="custom-control custom-checkbox">
@@ -132,7 +132,11 @@
                             <hr class="mb-4">
                             <div class="row">
                                 <div class="col-md-12 ">
-                                    <button class="btn btn-primary" type="submit">Upload & Analyse the file</button>
+                                    <button class="btn btn-primary" onclick="showSpinner()" type="submit"><span
+                                            aria-hidden="true" class="spinner-border spinner-border-sm" id="spinner"
+                                            role="status"
+                                            style="display: none"></span> Upload & Analyse the file
+                                    </button>
                                 </div>
                             </div>
                         </form>
@@ -153,6 +157,7 @@
                 </ol>
             </script>
 
+
             <script id="step-navigation-step-template" type="x-template">
                 <li :class="indicatorclass">
                     <div class="step"><i :class="step.icon_class"></i></div>
@@ -164,6 +169,14 @@
     </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
+        <div class="row" style="margin-bottom: 20px; margin-top: 20px">
+            <div class="col-md-12 " style="margin-top: 10px">
+                <a class="btn btn-success text-white" href="/" role="button">
+                    <i class="fa fa-home"></i>
+                    Home
+                </a>
+            </div>
+        </div>
         <p class="mb-1">&copy; 2022-2023 IBM</p>
         <ul class="list-inline">
             <li class="list-inline-item"><a href="#">Privacy</a></li>
@@ -177,7 +190,7 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src='/vue/2.4.4/vue.js'></script>
-<script src="/script.js"></script>
+<script src="/configScript.js"></script>
 <script>window.jQuery || document.write('<script src="/assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
 <script src="/assets/js/vendor/popper.min.js"></script>
 <script src="/dist/js/bootstrap.min.js"></script>
@@ -204,5 +217,6 @@
         }, false);
     })();
 </script>
+<script src="/toolsScript.js"></script>
 </body>
 </html>

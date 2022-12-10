@@ -15,7 +15,6 @@ public class CaseEvent {
     public static final String CASE_ID = "ch_case_id";
     public static final String EVENT_REF_ID = "ch_reference_id";
     public static final String EVENT_TYPE = "ch_type";
-
     public static final String CASE_TYPE = "ch_case_type";
     public static final String EVENT_STATUS = "ch_status";
     public static final String USER_NAME = "ch_user_name";
@@ -24,7 +23,6 @@ public class CaseEvent {
     public static final String ACTIVITY = "ch_name";
 
     HashMap<String, String> additionalAttribute;
-
 
     public CaseEvent(CSVRecord record, boolean lowerCase) {
 

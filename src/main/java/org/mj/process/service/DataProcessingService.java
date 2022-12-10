@@ -22,7 +22,7 @@ public class DataProcessingService {
         String pathOut = "/Users/jabrimalek/Project/lalux/compiled.csv";
         String delimiter = ";";
         DataMining dataMining = dataProcessingService.GetContentProcess(path, delimiter);
-        String levelEvent = "StepEvent";
+        String levelEvent = "Step";
         CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
         caseHistory.init(dataMining, levelEvent);
         // caseHistory.cleanCompletion();

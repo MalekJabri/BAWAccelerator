@@ -1,14 +1,10 @@
 package org.mj.process.model;
 
 import lombok.Data;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 
-@Component
-@Scope("session")
 @Data
-public class ServerRequest {
+public class DocumentRequest {
 
     String filePath;
     boolean cleanDate;

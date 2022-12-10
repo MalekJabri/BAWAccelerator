@@ -1,0 +1,28 @@
+<acm:Step xmlns:acm="http://www.ibm.com/ecm/casemanager/history/" xmlns:n1="https://w3.webahead.ibm.com/w3ki/display/MaricopaDev/V2"
+          n1:id="{302C4378-0100-C0FB-9ADD-BEEC200E9B13}_-4_1_59B18396A73372458B890DC6F67BFAAC"
+          acm:deltaCount="0">
+    <acm:name previousValue="Review">Review</acm:name>
+    <acm:status previousValue="INITIATED">INITIATED</acm:status>
+    <acm:entityID>{302C4378-0100-C0FB-9ADD-BEEC200E9B13}_-4_1_59B18396A73372458B890DC6F67BFAAC</acm:entityID>
+    <acm:referenceID>{302C4378-0100-C0FB-9ADD-BEEC200E9B13}</acm:referenceID>
+    <acm:caseID>{302C4378-0000-C997-9807-D954CDFC50EF}</acm:caseID>
+    <acm:CaseType>{E0BAC726-36D9-4BAB-A0AF-35478A5E9F93}</acm:CaseType>
+    <acm:startTime>1616034688000</acm:startTime>
+    <acm:endTime previousValue="253402297199000">253402297199000</acm:endTime>
+    <acm:eventTime previousValue="1616034688000">1616034688000</acm:eventTime>
+    <acm:LastModifier>dadmin</acm:LastModifier>
+    <acm:CaseFolderID previousValue="">{302C4378-0000-C997-9807-D954CDFC50EF}</acm:CaseFolderID>
+    <acm:TaskID previousValue="">{302C4378-0100-C0FB-9ADD-BEEC200E9B13}</acm:TaskID>
+    <acm:WobNumber previousValue="">59B18396A73372458B890DC6F67BFAAC</acm:WobNumber>
+    <acm:StepID previousValue="">{302C4378-0100-C0FB-9ADD-BEEC200E9B13}_-4_1_59B18396A73372458B890DC6F67BFAAC
+    </acm:StepID>
+    <acm:QueueName previousValue="">Conductor</acm:QueueName>
+    <acm:LastModificationDate previousValue="">1616034688000</acm:LastModificationDate>
+    <acm:LastModification previousValue="">INITIATION</acm:LastModification>
+    <acm:ISName previousValue="">Malfunction</acm:ISName>
+    <acm:StepName previousValue="">Review</acm:StepName>
+    <acm:Version previousValue="">1616034688000</acm:Version>
+    <acm:RegionId previousValue="">1</acm:RegionId>
+    <acm:EventID previousValue="">3a29ca46-0408-40e7-80c3-3b3015405bf9</acm:EventID>
+    <acm:sequence>1126</acm:sequence>
+</acm:Step>

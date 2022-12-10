@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Schema(name = "ServerECM", description = "the server where the document will be saved")
-public class ServerECM implements java.io.Serializable {
+public class FileNetServerRequest implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
 

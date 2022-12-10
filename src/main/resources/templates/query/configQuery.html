@@ -11,10 +11,7 @@
     <link href="/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet'>
     <link href="/style.css" rel="stylesheet">
-    <link
-            href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.3/css/bulma.min.css"
-            rel="stylesheet"
-    />
+    <link href="/dist/css/bulma.min.css" rel="stylesheet"/>
 
     <link href="/dual/style/style.css" rel="stylesheet"/>
     <link href="/dual/dist/dual-listbox.css" rel="stylesheet"/>
@@ -55,7 +52,7 @@
                         <label for="Level">Solutions</label>
                         <select class="custom-select d-block w-100" id="caseSolution"
                                 required th:field="${configurationRequest.solution}">
-                            <option selected value="">-- Solution--</option>
+                            <option value="">-- Solution--</option>
                             <option th:each="solution : ${Solutions}"
                                     th:text="${solution.display}"
                                     th:value="${solution.value}">
@@ -69,7 +66,10 @@
                         <label for="CaseType">CaseType</label>
                         <select class="custom-select d-block w-100" id="CaseType" required
                                 th:field="${configurationRequest.caseType}">
-
+                            <option th:each="casetype : ${CaseTypes}"
+                                    th:text="${casetype.display}"
+                                    th:value="${casetype.value}">
+                            </option>
                         </select>
                         <div class="invalid-feedback">
                             Please select a valid country.
@@ -93,20 +93,36 @@
                     </div>
                 </div>
                 <hr class="mb-4">
-                <div class="col-md-12 " id="PropertySection" th:style="${displayProperty}">
-                    <label for="Level">Properties</label>
-                    <pre class="dlb1"></pre>
-                    <select class="caseProperties" id="caseProperties" multiple
-                            th:field="${configurationRequest.properties}">
-                        <option value="aaaa">Empty</option>
-                    </select>
-                </div>
-                <hr class="mb-4">
                 <div class="row">
                     <div class="col-md-12 ">
-                        <button class="btn btn-primary" type="submit">Generate CSV</button>
+                    <textarea class="textarea" id="SQL_Query" name="SQL_Query" placeholder="SQL request"
+                              style="height:200px"></textarea>
+
+
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-12 " style="margin-top: 10px">
+                        <a class="btn btn-secondary text-white" onclick="copyClipboard()" role="button"><i
+                                class="fa fa-clipboard"></i>
+                            Copy text
+                        </a>
+                        <script>
+                            function copyClipboard() {
+                                // Get the text field
+                                var copyText = document.getElementById("SQL_Query");
+                                // Select the text field
+                                copyText.select();
+                                copyText.setSelectionRange(0, 99999); // For mobile devices
+                                // Copy the text inside the text field
+                                navigator.clipboard.writeText(copyText.value);
+                            }
+                        </script>
+                    </div>
+                </div>
+
+
             </form>
 
 
@@ -157,11 +173,12 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src='/vue/2.4.4/vue.js'></script>
-<script src="/configScript.js"></script>
+<script src="/queryScript.js"></script>
 <script>window.jQuery || document.write('<script src="/assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="/assets/js/vendor/popper.min.js"></script>
 <script src="/dist/js/bootstrap.min.js"></script>
 <script src="/assets/js/vendor/holder.min.js"></script>
+<script src="/toolsScript.js"></script>
 <script>
     // Example starter JavaScript for disabling form submissions if there are invalid fields
     (function () {
@@ -188,7 +205,7 @@
         function () {
             console.log("Call rest api to retrieve the list of case type for a solution");
             console.log("The solution is " + $(this).val());
-            $.getJSON("/api/core/caseTypes", {
+            $.getJSON("/api/core/caseTypesID", {
                 solution: $(this).val(),
                 ajax: 'true'
             }, function (data) {
@@ -200,39 +217,33 @@
                 }
                 html += '</option>';
                 $('#CaseType').html(html);
-
+                $("#id").css("display", "none");
             });
         }
     );
     $('#CaseType').change(
         function () {
-            console.log("Call rest api to retrieve the list of properties for the case type");
-            console.log("The case type is " + $(this).val());
-            $.getJSON("/api/core/properties", {
-                caseType: $(this).val(),
-                ajax: 'true'
-            }, function (data) {
-                var html = '';
-                var len = data.length;
-                for (var i = 0; i < len; i++) {
-                    html += '<option value="' + data[i].value + '">'
-                        + data[i].display + '</option>';
-                }
-                html += '</option>';
-                $('#caseProperties').html(html);
-                dlb1 = new DualListbox(".caseProperties");
-                dlb1.redraw();
-                dlb1.updateAvailableListbox();
-
-            });
+            const caseType = $('#CaseType').val();
+            const level = $('#Level').val();
+            $('#SQL_Query').val("SELECT CH_CONTENT, CH_ID, CH_TYPE, CH_STATUS, CH_CASE_ID, CH_CASE_TYPE, CH_ENTITY_ID, CH_REFERENCE_ID, CH_NAME, CH_USER_NAME, CH_START_TIME, CH_END_TIME" +
+                "FROM CH_CASEHIST " +
+                " WHERE CH_TYPE  = '" + level + "' and  CH_CASE_TYPE = '" + caseType + "'");
+        }
+    );
+    $('#Level').change(
+        function () {
+            const caseType = $('#CaseType').val();
+            const level = $('#Level').val();
+            $('#SQL_Query').val("SELECT CH_CONTENT, CH_ID, CH_TYPE, CH_STATUS, CH_CASE_ID, CH_CASE_TYPE, CH_ENTITY_ID, CH_REFERENCE_ID, CH_NAME, CH_USER_NAME, CH_START_TIME, CH_END_TIME" +
+                "FROM CH_CASEHIST " +
+                " WHERE CH_TYPE  = '" + level + "' and  CH_CASE_TYPE = '" + caseType + "'");
         }
     );
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.8.1/prism.min.js"></script>
+<script src="/dist/js/prism.min.js"></script>
 <script src="/dual/dist/dual-listbox.js"></script>
-<script src="/toolsScript.js"></script>
 <script>
-    var dlb1;
+    var dlb1 = new DualListbox(".caseProperties");
 </script>
 </body>
 </html>

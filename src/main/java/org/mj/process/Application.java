@@ -16,6 +16,6 @@ public class Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        logger.info("Cool");
+        logger.info("Start of the Business Automation Workflow accelerator for process mining ");
     }
 }
