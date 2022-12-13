@@ -39,3 +39,5 @@ build/
 /documents/
 
 *.csv
+/config.properties
+/connection.properties
