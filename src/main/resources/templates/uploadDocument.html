@@ -81,12 +81,25 @@
 
                             <hr class="mb-4">
                             <h4 class="mb-3">CSV Information</h4>
-                            <div class="=row">
-                                <div class="col-md-6 ">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
                                     <label for="Delimiter">Delimiter</label>
-                                    <input class="form-control" id="Delimiter" placeholder=";"
+                                    <input class="form-control d-block w-50" id="Delimiter" placeholder=";"
                                            th:field="${csvImport.delimiter}" type="text"
                                            value=";">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="Level">Level</label>
+                                    <select class="custom-select d-block w-75" id="Level"
+                                            th:field="${csvImport.eventLevel}">
+                                        <option th:each="level : ${Levels}"
+                                                th:text="${level.display}"
+                                                th:value="${level.value}">
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid state.
+                                    </div>
                                 </div>
                             </div>
                             <hr class="mb-4">
@@ -98,6 +111,9 @@
                                                th:field="${csvImport.cleanDate}" type="checkbox">
                                         <label class="custom-control-label" for="cleanDate">Clean Date</label>
                                     </div>
+
+                                </div>
+                                <div class="col-md-6 mb-3">
                                     <div class="custom-control custom-checkbox">
                                         <input class="custom-control-input" id="cleanIDAttribute"
                                                th:field="${csvImport.cleanIDAttribute}" type="checkbox">
@@ -105,7 +121,6 @@
                                             Attribute</label>
                                     </div>
                                 </div>
-
                             </div>
                             <hr class="mb-4">
                             <h4 class="mb-3">Transform:</h4>
@@ -129,13 +144,22 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="=row">
+                                <div class="col-md-6 ">
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" id="ChContent"
+                                               th:field="${csvImport.encoded64Bit}" type="checkbox">
+                                        <label class="custom-control-label" for="ChContent">Encoded 64bit
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                             <hr class="mb-4">
                             <div class="row">
                                 <div class="col-md-12 ">
-                                    <button class="btn btn-primary" onclick="showSpinner()" type="submit"><span
-                                            aria-hidden="true" class="spinner-border spinner-border-sm" id="spinner"
-                                            role="status"
-                                            style="display: none"></span> Upload & Analyse the file
+                                    <button class="btn btn-primary" onclick="showSpinner()" type="submit"><i
+                                            class="fa fa-upload" style="padding-right: 5px"></i> Upload & Analyse the
+                                        file
                                     </button>
                                 </div>
                             </div>

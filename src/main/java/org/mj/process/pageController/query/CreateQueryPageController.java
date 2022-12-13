@@ -3,7 +3,9 @@ package org.mj.process.pageController.query;
 import org.mj.process.model.ConfigurationRequest;
 import org.mj.process.model.ConnectionRequest;
 import org.mj.process.service.CaseTypeService;
+import org.mj.process.service.LocalPropertiesTools;
 import org.mj.process.service.ServerConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,15 +16,21 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.logging.Logger;
 
-import static org.mj.process.pageController.config.UploadPageController.getConnectionRequest;
 import static org.mj.process.pageController.config.baw.CaseServerPageController.getEventsType;
 
 @Controller
 public class CreateQueryPageController {
 
+
     private static Logger logger = Logger.getLogger(CreateQueryPageController.class.getName());
     @Value("${process-mining.default-value}")
     private boolean initValue;
+
+    @Value("${process-mining.config.file}")
+    private String configPath;
+
+    @Autowired
+    private LocalPropertiesTools propertiesTools;
 
     @GetMapping("/connectToServer")
     public String prepareConfServer(HttpSession session, HttpServletResponse response, Model model) {
@@ -30,7 +38,7 @@ public class CreateQueryPageController {
         ConnectionRequest connectionRequest;
         if (session.getAttribute("connectionRequest") == null)
             if (initValue) {
-                connectionRequest = getConnectionRequest();
+                connectionRequest = propertiesTools.getConnectionRequest();
             } else connectionRequest = new ConnectionRequest();
         else connectionRequest = (ConnectionRequest) session.getAttribute("connectionRequest");
         model.addAttribute("message", "");

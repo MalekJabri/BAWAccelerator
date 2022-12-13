@@ -29,7 +29,7 @@
 <div class="container">
     <div class="py-5 text-center">
         <img alt="IBM" class="d-block mx-auto mb-4" height="72"
-             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy0X1V2RhRy2o3Z7_kQktyYZKoYAHUksXivJJg1CSn&s"
+             src="/assets/img/processmining.png"
              width="72">
         <h2>Configuration form</h2>
         <p class="lead">Below is the form to configure process mining project.</p>
@@ -40,22 +40,21 @@
 
     <div class="container">
         <div id="app">
-            <step-navigation :currentstep=3 :steps="steps"></step-navigation>
-
+            <step-navigation :currentstep=4 :steps="steps"></step-navigation>
             <h1>Configuration</h1>
             <hr class="mb-4">
             <h4 class="mb-3">Process Mining </h4>
-            <form enctype="multipart/form-data" method="post" th:action="@{/configuration}"
+            <form enctype="multipart/form-data" method="post" th:action="@{/publishProject}"
                   th:object="${configPMProject}">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="Level">Solutions</label>
-                        <select class="custom-select d-block w-100" id="caseSolution"
-                                required th:field="${configPMProject.}">
-                            <option value="">-- Solution--</option>
-                            <option th:each="solution : ${Solutions}"
-                                    th:text="${solution.display}"
-                                    th:value="${solution.value}">
+                        <label for="organisation">Organisation</label>
+                        <select class="custom-select d-block w-100" id="organisation"
+                                required th:field="${configPMProject.orgID}">
+                            <option value="">-- Organisation--</option>
+                            <option th:each="organisation : ${organisations}"
+                                    th:text="${organisation.display}"
+                                    th:value="${organisation.value}">
                             </option>
                         </select>
                         <div class="invalid-feedback">
@@ -63,66 +62,50 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="CaseType">CaseType</label>
-                        <select class="custom-select d-block w-100" id="CaseType" required
-                                th:field="${configurationRequest.caseType}">
-                            <option th:each="casetype : ${CaseTypes}"
-                                    th:text="${casetype.display}"
-                                    th:value="${casetype.value}">
-                            </option>
+                        <label for="Project">Existing project</label>
+                        <select class="custom-select d-block w-100" id="Project">
+                            <option value="">-- Project --</option>
+                            th:field="${configPMProject.projectName}">
                         </select>
                         <div class="invalid-feedback">
                             Please select a valid country.
                         </div>
                     </div>
                 </div>
-                <hr class="mb-4">
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="Level">Level</label>
-                        <select class="custom-select d-block w-100" id="Level"
-                                th:field="${configurationRequest.level}">
-                            <option th:each="level : ${Levels}"
-                                    th:text="${level.display}"
-                                    th:value="${level.value}">
-                            </option>
-                        </select>
-                        <div class="invalid-feedback">
-                            Please provide a valid state.
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" id="uploadData"
+                                   th:field="${configPMProject.uploadData}" type="checkbox">
+                            <label class="custom-control-label" for="uploadData">Upload data
+                            </label>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" id="append"
+                                   th:field="${configPMProject.append}" type="checkbox">
+                            <label class="custom-control-label" for="append">Append</label>
                         </div>
                     </div>
                 </div>
-                <hr class="mb-4">
-                <div class="row">
-                    <div class="col-md-12 ">
-                    <textarea class="textarea" id="SQL_Query" name="SQL_Query" placeholder="SQL request"
-                              style="height:200px"></textarea>
-
-
-                    </div>
-                </div>
-
                 <div class="row">
                     <div class="col-md-12 " style="margin-top: 10px">
-                        <a class="btn btn-secondary text-white" onclick="copyClipboard()" role="button"><i
-                                class="fa fa-clipboard"></i>
-                            Copy text
-                        </a>
-                        <script>
-                            function copyClipboard() {
-                                // Get the text field
-                                var copyText = document.getElementById("SQL_Query");
-                                // Select the text field
-                                copyText.select();
-                                copyText.setSelectionRange(0, 99999); // For mobile devices
-                                // Copy the text inside the text field
-                                navigator.clipboard.writeText(copyText.value);
-                            }
-                        </script>
+                        <label for="newProjectName">New project name</label>
+                        <input class="form-control" id="newProjectName"
+                               required th:field="${configPMProject.projectName}" type="text"/>
                     </div>
                 </div>
-
-
+                <hr class="mb-4">
+                <div class="row">
+                    <div class="col-md-12 " style="margin-top: 10px">
+                        <button class="btn btn-primary" data-target="#processMiningModalCenter" data-toggle="modal"
+                                type="submit">Create Project
+                        </button>
+                    </div>
+                </div>
             </form>
 
 
@@ -151,6 +134,25 @@
         </div>
     </div>
 
+    <div aria-hidden="true" aria-labelledby="exampleModalCenterTitle" class="modal fade" id="processMiningModalCenter"
+         role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="processMiningTitle">Preparation of the CSV</h5>
+                </div>
+                <div class="modal-body">
+                    A new project will be created and the data will be uploaded.
+                    <p></p>
+                    Please wait !!!.
+                    <p></p>
+                    <img src="/assets/img/processPM.gif">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <footer class="my-5 pt-5 text-muted text-center text-small">
         <div class="row" style="margin-bottom: 20px; margin-top: 20px">
             <div class="col-md-12 " style="margin-top: 10px">
@@ -173,7 +175,7 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src='/vue/2.4.4/vue.js'></script>
-<script src="/queryScript.js"></script>
+<script src="/configScript.js"></script>
 <script>window.jQuery || document.write('<script src="/assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="/assets/js/vendor/popper.min.js"></script>
 <script src="/dist/js/bootstrap.min.js"></script>
@@ -201,44 +203,27 @@
     })();
 </script>
 <script>
-    $('#caseSolution').change(
+    $('#organisation').change(
         function () {
-            console.log("Call rest api to retrieve the list of case type for a solution");
-            console.log("The solution is " + $(this).val());
-            $.getJSON("/api/core/caseTypesID", {
+            console.log("Call rest api to retrieve the list of project  for an organisation");
+            console.log("The organisation is " + $(this).val());
+            $.getJSON("/api/core/getProjects", {
                 solution: $(this).val(),
                 ajax: 'true'
             }, function (data) {
-                var html = '<option value="">-- case type --</option>';
+                var html = '<option value="">-- project --</option>';
                 var len = data.length;
                 for (var i = 0; i < len; i++) {
                     html += '<option value="' + data[i].value + '">'
                         + data[i].display + '</option>';
                 }
                 html += '</option>';
-                $('#CaseType').html(html);
+                $('#Project').html(html);
                 $("#id").css("display", "none");
             });
         }
     );
-    $('#CaseType').change(
-        function () {
-            const caseType = $('#CaseType').val();
-            const level = $('#Level').val();
-            $('#SQL_Query').val("SELECT CH_CONTENT, CH_ID, CH_TYPE, CH_STATUS, CH_CASE_ID, CH_CASE_TYPE, CH_ENTITY_ID, CH_REFERENCE_ID, CH_NAME, CH_USER_NAME, CH_START_TIME, CH_END_TIME" +
-                "FROM CH_CASEHIST " +
-                " WHERE CH_TYPE  = '" + level + "' and  CH_CASE_TYPE = '" + caseType + "'");
-        }
-    );
-    $('#Level').change(
-        function () {
-            const caseType = $('#CaseType').val();
-            const level = $('#Level').val();
-            $('#SQL_Query').val("SELECT CH_CONTENT, CH_ID, CH_TYPE, CH_STATUS, CH_CASE_ID, CH_CASE_TYPE, CH_ENTITY_ID, CH_REFERENCE_ID, CH_NAME, CH_USER_NAME, CH_START_TIME, CH_END_TIME" +
-                "FROM CH_CASEHIST " +
-                " WHERE CH_TYPE  = '" + level + "' and  CH_CASE_TYPE = '" + caseType + "'");
-        }
-    );
+
 </script>
 <script src="/dist/js/prism.min.js"></script>
 <script src="/dual/dist/dual-listbox.js"></script>

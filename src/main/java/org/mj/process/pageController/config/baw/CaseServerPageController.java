@@ -1,11 +1,9 @@
 package org.mj.process.pageController.config.baw;
 
-import com.ibm.mj.ApiClient;
 import org.mj.process.model.*;
 import org.mj.process.restController.CaseController;
 import org.mj.process.service.CaseTypeService;
 import org.mj.process.service.DataProcessingService;
-import org.mj.process.service.ProcessMiningService;
 import org.mj.process.service.ServerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -17,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 @Controller
@@ -28,6 +24,9 @@ public class CaseServerPageController {
     private static Logger logger = Logger.getLogger(CaseServerPageController.class.getName());
     @Value("${process-mining.default-value}")
     private boolean initValue;
+
+    @Value("${process-mining.config.file}")
+    private String configPath;
 
     public static List<Attribute> getEventsType() {
         List<Attribute> attributes = new ArrayList<>();
@@ -45,27 +44,20 @@ public class CaseServerPageController {
         try {
             serverConfig = new ServerConfig(connectionRequest.getFileNetServerRequest());
             logger.info("The object store is  " + serverConfig.getOs().get_Name());
-            ProcessMiningService processMiningService = new ProcessMiningService();
-            ApiClient apiClient = processMiningService.getDefaultClient(connectionRequest.getProcessMiningServerRequest());
-            logger.info("Apiclient :" + apiClient);
         } catch (Exception e) {
             model.addAttribute("message", "Connection to server failed, please verify parameters");
             model.addAttribute("connectionRequest", connectionRequest);
             model.addAttribute("classAlert", "alert alert-warning");
             model.addAttribute("displayMessage", "");
-            return "connectToServer";
+            return "bawCase/connectToServer";
         }
         try {
             DataProcessingService dataProcessingService = new DataProcessingService();
             DataMining dataMining = dataProcessingService.GetContentProcess(documentRequest.getFilePath(), documentRequest.getDelimiter());
             CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
-            caseHistory.init(dataMining, "TaskEvent");
+            caseHistory.init(dataMining, documentRequest);
             dataMining = null;
-            Set<String> caseTypes = new HashSet<>();
-            caseHistory.getEvents().forEach((id, event) -> {
-                caseTypes.add(event.getCaseType());
-            });
-            logger.info("The number of case type found in the CSV is " + caseTypes.size());
+            logger.info("The number of case type found in the CSV is " + caseHistory.getCaseTypes().size());
             CaseTypeService caseTypeService = new CaseTypeService(serverConfig);
             //  model.addAttribute("CaseTypes", caseTypeService.getAttributesForCaseTypes(caseTypes));
             //   model.addAttribute("Solutions", caseTypeService.getAttributesForCaseSolution(caseTypes));
@@ -87,7 +79,7 @@ public class CaseServerPageController {
         model.addAttribute("displayMessage", "");
         model.addAttribute("position", 3);
         model.addAttribute("displayProperty", "display:none");
-        return "configuration1";
+        return "bawCase/configuration1";
     }
 
     private List<Attribute> getProperties() {
@@ -116,6 +108,6 @@ public class CaseServerPageController {
         model.addAttribute("classAlert", "alert alert-success");
         model.addAttribute("displayMessage", "");
         model.addAttribute("displayProperty", "");
-        return "configuration1";
+        return "bawCase/configuration1";
     }
 }

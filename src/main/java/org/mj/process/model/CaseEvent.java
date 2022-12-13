@@ -13,7 +13,10 @@ import java.util.List;
 public class CaseEvent {
 
     public static final String CASE_ID = "ch_case_id";
+
+    public static final String CONTENT = "ch_content";
     public static final String EVENT_REF_ID = "ch_reference_id";
+    public static final String EVENT_ENTITY_ID = "ch_entity_id";
     public static final String EVENT_TYPE = "ch_type";
     public static final String CASE_TYPE = "ch_case_type";
     public static final String EVENT_STATUS = "ch_status";
@@ -22,33 +25,15 @@ public class CaseEvent {
     public static final String END_TIME = "ch_end_time";
     public static final String ACTIVITY = "ch_name";
 
-    HashMap<String, String> additionalAttribute;
+    private HashMap<String, String> additionalAttribute;
 
-    public CaseEvent(CSVRecord record, boolean lowerCase) {
-
+    public CaseEvent(CSVRecord record, HashMap<String, String> defaultAttributes) {
         additionalAttribute = new HashMap<>();
-        if (lowerCase) {
-            additionalAttribute.put(CASE_ID, record.get(CASE_ID));
-            additionalAttribute.put(EVENT_REF_ID, record.get(EVENT_REF_ID));
-            additionalAttribute.put(EVENT_TYPE, record.get(EVENT_TYPE));
-            additionalAttribute.put(EVENT_STATUS, record.get(EVENT_STATUS));
-            additionalAttribute.put(USER_NAME, record.get(USER_NAME));
-            additionalAttribute.put(START_TIME, cleanDate(record.get(START_TIME)));
-            additionalAttribute.put(END_TIME, cleanDate(record.get(END_TIME)));
-            additionalAttribute.put(ACTIVITY, record.get(ACTIVITY));
-            additionalAttribute.put(CASE_TYPE, record.get(CASE_TYPE));
-        } else {
-            additionalAttribute.put(CASE_ID, record.get(CASE_ID.toUpperCase()));
-            additionalAttribute.put(EVENT_REF_ID, record.get(EVENT_REF_ID.toUpperCase()));
-            additionalAttribute.put(EVENT_TYPE, record.get(EVENT_TYPE.toUpperCase()));
-            additionalAttribute.put(EVENT_STATUS, record.get(EVENT_STATUS.toUpperCase()));
-            additionalAttribute.put(USER_NAME, record.get(USER_NAME.toUpperCase()));
-            additionalAttribute.put(START_TIME, cleanDate(record.get(START_TIME.toUpperCase())));
-            additionalAttribute.put(END_TIME, cleanDate(record.get(END_TIME.toUpperCase())));
-            additionalAttribute.put(ACTIVITY, record.get(ACTIVITY.toUpperCase()));
-            additionalAttribute.put(CASE_TYPE, record.get(CASE_TYPE.toUpperCase()));
-        }
-
+        defaultAttributes.forEach((key, storedKey) -> {
+            if (key.contains("TIME") || key.contains("time")) {
+                additionalAttribute.put(key, cleanDate(record.get(storedKey)));
+            } else additionalAttribute.put(key, record.get(storedKey));
+        });
     }
 
 
@@ -71,7 +56,8 @@ public class CaseEvent {
 
 
     private String cleanDate(String date) {
-        return date.substring(0, date.indexOf(","));
+        if (date.contains(",")) return date.substring(0, date.lastIndexOf(","));
+        return date.substring(0, date.lastIndexOf("."));
     }
 
     public String getStatus() {
@@ -84,6 +70,10 @@ public class CaseEvent {
 
     public String getReferenceID() {
         return additionalAttribute.get(EVENT_REF_ID);
+    }
+
+    public String getEventEntityId() {
+        return additionalAttribute.get(EVENT_ENTITY_ID);
     }
 
     public String getEventType() {

@@ -29,7 +29,7 @@
 <div class="container">
     <div class="py-5 text-center">
         <img alt="IBM" class="d-block mx-auto mb-4" height="72"
-             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy0X1V2RhRy2o3Z7_kQktyYZKoYAHUksXivJJg1CSn&s"
+             src="/assets/img/processmining.png"
              width="72">
         <h2>Configuration form</h2>
         <p class="lead">Below is the form to configure process mining project.</p>
@@ -49,7 +49,7 @@
                   th:object="${configurationRequest}">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="Level">Solutions</label>
+                        <label for="caseSolution">Solutions</label>
                         <select class="custom-select d-block w-100" id="caseSolution"
                                 required th:field="${configurationRequest.solution}">
                             <option value="">-- Solution--</option>
@@ -77,24 +77,8 @@
                     </div>
                 </div>
                 <hr class="mb-4">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="Level">Level</label>
-                        <select class="custom-select d-block w-100" id="Level"
-                                th:field="${configurationRequest.level}">
-                            <option th:each="level : ${Levels}"
-                                    th:text="${level.display}"
-                                    th:value="${level.value}">
-                            </option>
-                        </select>
-                        <div class="invalid-feedback">
-                            Please provide a valid state.
-                        </div>
-                    </div>
-                </div>
-                <hr class="mb-4">
                 <div class="col-md-12 " th:style="${displayProperty}">
-                    <label for="Level">Properties</label>
+                    <label for="caseProperties">Properties</label>
                     <pre class="dlb1"></pre>
                     <select class="caseProperties" id="caseProperties" multiple
                             th:field="${configurationRequest.properties}">
@@ -106,8 +90,20 @@
                 </div>
                 <hr class="mb-4">
                 <div class="row">
-                    <div class="col-md-12 ">
-                        <button class="btn btn-primary" type="submit">Generate CSV</button>
+                    <div class="col-md-6 ">
+                        <button class="btn btn-primary" data-target="#exampleModalCenter" data-toggle="modal"
+                                name="action" type="submit"
+                                value="generate"><i class="fa fa-file-text-o" style="padding-right: 5px"></i> Generate
+                            the CSV
+                        </button>
+                    </div>
+                    <div class="col-md-6 ">
+                        <button class="btn btn-secondary" data-target="#generateCSVModalCenter" data-toggle="modal"
+                                name="action"
+                                type="submit" value="publish"><i class="fa fa-upload" style="padding-right: 5px"></i>
+                            Publish to
+                            Process Mining
+                        </button>
                     </div>
                 </div>
             </form>
@@ -135,6 +131,25 @@
             </script>
 
 
+        </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="generateCSVModalCenterTitle" class="modal fade" id="generateCSVModalCenter"
+         role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="generateCSVModalLongTitle">Preparation of the CSV</h5>
+                </div>
+                <div class="modal-body">
+                    We collect all the requested information, and we're enhancing the CSV output.
+                    <p></p>
+                    Please wait !!!.
+                    <p></p>
+                    <img src="/assets/img/selsel-spin.gif">
+                </div>
+
+            </div>
         </div>
     </div>
 

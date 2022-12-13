@@ -25,7 +25,7 @@
 <div class="container">
     <div class="py-5 text-center">
         <img alt="IBM" class="d-block mx-auto mb-4" height="72"
-             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy0X1V2RhRy2o3Z7_kQktyYZKoYAHUksXivJJg1CSn&s"
+             src="/assets/img/processmining.png"
              width="72">
         <h2>Configuration form</h2>
         <p class="lead">Below is the form to configure process mining project.</p>
@@ -89,7 +89,7 @@
                 </div>
 
                 <hr class="mb-3">
-                <button type="submit" class="btn btn-primary" onclick="showSpinner()" > <span class="fa-spinner" role="status" id="spinner"  ></span> Next Step</button>
+                <button type="submit" class="btn btn-primary" onclick="showSpinner()" ><i class="fa fa-circle"></i> Next Step</button>
             </form>
             <step :currentstep="currentstep" :key="step.id" :step="step" :stepcount="steps.length"
                   @step-change="stepChanged"

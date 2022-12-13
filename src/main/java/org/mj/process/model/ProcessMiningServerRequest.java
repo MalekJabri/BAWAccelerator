@@ -8,4 +8,5 @@ public class ProcessMiningServerRequest {
     String url;
     String apikey;
     String userID;
+    private boolean save;
 }

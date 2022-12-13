@@ -21,5 +21,6 @@ public class FileNetServerRequest implements java.io.Serializable {
     private String password;
     @Schema(name = "repository", required = true, example = "tos")
     private String repository;
+    private boolean save;
 
 }

@@ -10,6 +10,9 @@ public class DocumentRequest {
     boolean cleanDate;
     String delimiter;
     boolean cleanIDAttribute;
-    String DateFormat;
+    String dateFormat;
     boolean addInformation;
+    boolean encoded64Bit;
+    String eventLevel;
+    String caseType;
 }

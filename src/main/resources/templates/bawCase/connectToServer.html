@@ -25,7 +25,7 @@
 <div class="container">
     <div class="py-5 text-center">
         <img alt="IBM" class="d-block mx-auto mb-4" height="72"
-             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy0X1V2RhRy2o3Z7_kQktyYZKoYAHUksXivJJg1CSn&s"
+             src="/assets/img/processmining.png"
              width="72">
         <h2>Configuration form</h2>
         <p class="lead">Below is the form to configure process mining project.</p>
@@ -88,40 +88,11 @@
 
                 </div>
                 <hr class="mb-4">
-            <div class="col-md-12 order-md-1">
-                <h4 class="mb-3">Process mining server</h4>
-                    <div class="row">
-
-                        <div class="col-md-6 mb-3">
-                            <label for="username">UserName</label>
-                            <input class="form-control" id="userID" placeholder="admin" th:field="${connectionRequest.processMiningServerRequest.userID}" required type="text">
-                            <div class="invalid-feedback">
-                                Valid first name is required.
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="password">Password</label>
-                            <input class="form-control" id="apiKey" th:field="${connectionRequest.processMiningServerRequest.apikey}"  required type="text">
-                            <div class="invalid-feedback">
-                                Valid last name is required.
-                            </div>
-                        </div>
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <button type="submit" class="btn btn-primary" ><i class="fa fa-arrow-right" style="padding-right: 5px"></i> Next Step</button>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12 ">
-                            <label for="url">URL<span class="text-muted">(ip/hostname)</span></label>
-                            <input class="form-control" id="url" placeholder="url server" th:field="${connectionRequest.processMiningServerRequest.url}" required
-                                   type="text">
-                            <div class="invalid-feedback">
-                                Please enter url for process mining server.
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="mb-3">
-                    <button type="submit" class="btn btn-primary" >Next Step</button>
-
                 </div>
-
             </form>
             <step :currentstep="currentstep" :key="step.id" :step="step" :stepcount="steps.length"
                   @step-change="stepChanged"
