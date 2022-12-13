@@ -95,6 +95,15 @@ public class DataProcessingService {
             caseHistory.getEvents().forEach((id, caseEvent) -> {
 
                 try {
+
+                    if (myheaders.length != caseEvent.getValues().size()) {
+                        System.out.println("Difference header ");
+                        System.out.println(Arrays.toString(myheaders));
+                        System.out.println(caseEvent.getHeaders());
+                        System.out.println();
+                    }
+
+
                     printer.printRecord(caseEvent.getValues());
                     count.getAndIncrement();
                 } catch (IOException e) {
