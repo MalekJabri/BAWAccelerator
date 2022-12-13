@@ -28,7 +28,7 @@ public class CaseHistory {
     public void init(DataMining dataMining, DocumentRequest config) {
         caseTypes = new HashMap<>();
         for (CSVRecord record : dataMining.getRecords()) {
-            CaseEvent newCaseEvent = new CaseEvent(record, dataMining.getDefaultAttributes());
+            CaseEvent newCaseEvent = new CaseEvent(record, dataMining.getDefaultAttributes(), config.getDateFormat(), config.getTargetDateFormat());
             if (newCaseEvent.getEventType().equals(config.getEventLevel())) {
                 if (caseTypes.containsKey(newCaseEvent.getCaseType())) {
                     caseTypes.replace(newCaseEvent.getCaseType(), (caseTypes.get(newCaseEvent.getCaseType())) + 1);
@@ -40,12 +40,15 @@ public class CaseHistory {
     }
 
     public void processData(DataMining dataMining, DocumentRequest config) {
+        String dateFormat = config.getDateFormat();
+        if (config.getTargetDateFormat() != null && !config.getTargetDateFormat().isEmpty())
+            dateFormat = config.getTargetDateFormat();
         events = new HashMap<>();
         CaseEvent newCaseEvent = null;
         logger.info("The number of element in the csv");
         System.out.println("Has next " + dataMining.getRecords().iterator().hasNext());
         for (CSVRecord record : dataMining.getRecords()) {
-            newCaseEvent = new CaseEvent(record, dataMining.getDefaultAttributes());
+            newCaseEvent = new CaseEvent(record, dataMining.getDefaultAttributes(), config.getDateFormat(), config.getTargetDateFormat());
             if (newCaseEvent.getCaseType().equals(config.getCaseType()) && newCaseEvent.getEventType().equals(config.getEventLevel())) {
                 if (events.containsKey(newCaseEvent.getEventEntityId())) {
                     CaseEvent oldCase = events.get(newCaseEvent.getEventEntityId());
@@ -56,7 +59,7 @@ public class CaseHistory {
                         oldCase.setEnd_time(newCaseEvent.getEnd_time());
                     }
                     if (record.get(dataMining.getHeader(CaseEvent.CONTENT)) != null) {
-                        oldCase.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(dataMining.getHeader(CaseEvent.CONTENT)), config.isEncoded64Bit(), config.dateFormat));
+                        oldCase.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(dataMining.getHeader(CaseEvent.CONTENT)), config.getEncodedFormat(), dateFormat));
                     }
                     if (newCaseEvent.getStatus().equals("START_WORKING")) {
 
@@ -65,7 +68,7 @@ public class CaseHistory {
                     events.replace(oldCase.getEventEntityId(), oldCase);
                 } else {
                     if (record.get(dataMining.getHeader(CaseEvent.CONTENT)) != null) {
-                        newCaseEvent.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(dataMining.getHeader(CaseEvent.CONTENT)), config.isEncoded64Bit(), config.dateFormat));
+                        newCaseEvent.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(dataMining.getHeader(CaseEvent.CONTENT)), config.getEncodedFormat(), dateFormat));
                     }
                     events.put(newCaseEvent.getEventEntityId(), newCaseEvent);
 

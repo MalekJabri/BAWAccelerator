@@ -2,10 +2,10 @@ package org.mj.process.pageController.config.processMining;
 
 import com.ibm.mj.ApiClient;
 import com.ibm.mj.processmining.model.ProcessInfo;
-import org.mj.process.model.generic.Attribute;
 import org.mj.process.model.ConfigPMProject;
-import org.mj.process.model.servers.ConnectionRequest;
 import org.mj.process.model.DocumentRequest;
+import org.mj.process.model.generic.Attribute;
+import org.mj.process.model.servers.ConnectionRequest;
 import org.mj.process.service.LocalPropertiesTools;
 import org.mj.process.service.ProcessMiningService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -74,8 +75,13 @@ public class ProcessMiningServerPageController {
 
     @PostMapping("/publishProject")
     public String publishProject(HttpSession session, HttpServletResponse response, Model model, ConfigPMProject configPMProject) {
+
         DocumentRequest documentRequest = (DocumentRequest) session.getAttribute("documentRequest");
         ConnectionRequest connectionRequest = (ConnectionRequest) session.getAttribute("connectionRequest");
+        String dateFormat = documentRequest.getDateFormat();
+        if (documentRequest.getTargetDateFormat() != null && !documentRequest.getTargetDateFormat().isEmpty())
+            dateFormat = documentRequest.getTargetDateFormat();
+
         List<Attribute> organisations = new ArrayList<>();
         try {
             ProcessMiningService processMiningService = new ProcessMiningService();
@@ -85,6 +91,11 @@ public class ProcessMiningServerPageController {
             if (configPMProject.getUploadData() && processInfo != null) {
                 String finalDoc = (String) session.getAttribute("finalDoc");
                 processMiningService.uploadData(apiClient, processInfo.getProjectName(), configPMProject.getOrgID(), finalDoc, configPMProject.getAppend());
+                String[] headers = (String[]) session.getAttribute("headerCSV");
+                if (headers != null && headers.length > 0)
+                    logger.info("Map field to process mining");
+                logger.info("Header to map " + Arrays.toString(headers));
+                processMiningService.createLog(processInfo.getProjectName(), processInfo.getOrganization(), apiClient, headers, documentRequest.isAddInformation(), dateFormat);
             }
             logger.info("Creation for the project :" + configPMProject.getProjectName() + "-->" + projectSuccess);
         } catch (Exception e) {

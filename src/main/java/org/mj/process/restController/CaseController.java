@@ -29,7 +29,7 @@ public class CaseController {
             logger.warning("The connection request is empty");
         } else {
             logger.info("The connection request has been found");
-            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
+            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBawContentServer());
             CaseTypeService caseTypeService = new CaseTypeService(serverConfig);
             CaseType caseType = caseTypeService.getCaseType(caseTypeID);
             HashMap<String, String> values = caseTypeService.GetPropertiesForCaseType(caseType, true);
@@ -50,7 +50,7 @@ public class CaseController {
             logger.warning("The connection request is empty");
         } else {
             logger.info("The connection request has been found");
-            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
+            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBawContentServer());
             CaseTypeService caseTypeService = new CaseTypeService(serverConfig);
             caseTypes = caseTypeService.getAttributesCaseType(solution);
             logger.info("list attributes for the case type");
@@ -68,7 +68,7 @@ public class CaseController {
             logger.warning("The connection request is empty");
         } else {
             logger.info("The connection request has been found");
-            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
+            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBawContentServer());
             CaseTypeService caseTypeService = new CaseTypeService(serverConfig);
             caseTypes = caseTypeService.getAttributesIDCaseType(solution);
             logger.info("list attributes for the case type");

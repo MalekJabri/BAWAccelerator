@@ -44,14 +44,14 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="username">UserName</label>
-                                <input class="form-control" id="username" placeholder="admin" th:field="${connectionRequest.getBAWContentServer.user}" required type="text" >
+                                <input class="form-control" id="username" placeholder="admin" th:field="${connectionRequest.bawContentServer.user}" required type="text" >
                                 <div class="invalid-feedback">
                                     Valid first name is required.
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="password">Password</label>
-                                <input class="form-control" id="password" placeholder="*******" th:field="${connectionRequest.getBAWContentServer.password}" th:value="${connectionRequest.getBAWContentServer.password}" required type="text">
+                                <input class="form-control" id="password" placeholder="*******" th:field="${connectionRequest.bawContentServer.password}" th:value="${connectionRequest.bawContentServer.password}" required type="password">
                                 <div class="invalid-feedback">
                                     Valid last name is required.
                                 </div>
@@ -60,7 +60,7 @@
                         <div class="row">
                             <div class="col-md-12 ">
                                 <label for="hostname">Hostname <span class="text-muted">(ip/hostname)</span></label>
-                                <input class="form-control" id="hostname" placeholder="filenet server" th:field="${connectionRequest.getBAWContentServer.server}" required
+                                <input class="form-control" id="hostname" placeholder="filenet server" th:field="${connectionRequest.bawContentServer.server}" required
                                        type="text">
                                 <div class="invalid-feedback">
                                     Please enter a valid hostname or IP address for target object store updates.
@@ -70,7 +70,7 @@
                         <div class="row " style="padding-top: 20px">
                             <div class="col-md-6 mb-3">
                                 <label for="objectStore">Repository</span></label>
-                                <input class="form-control" id="objectStore" placeholder="TOS" th:field="${connectionRequest.getBAWContentServer.repository}" required
+                                <input class="form-control" id="objectStore" placeholder="TOS" th:field="${connectionRequest.bawContentServer.repository}" required
                                        type="text">
                                 <div class="invalid-feedback">
                                     Please enter a valid Object Store / repository
@@ -78,7 +78,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="port">Port</span></label>
-                                <input class="form-control" id="port" placeholder="9080" th:field="${connectionRequest.getBAWContentServer.port}" required
+                                <input class="form-control" id="port" placeholder="9080" th:field="${connectionRequest.bawContentServer.port}" required
                                        type="text">
                                 <div class="invalid-feedback">
                                     Port

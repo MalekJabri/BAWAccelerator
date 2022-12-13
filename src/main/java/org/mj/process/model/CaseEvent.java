@@ -4,7 +4,10 @@ import lombok.Data;
 import lombok.ToString;
 import org.apache.commons.csv.CSVRecord;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,14 +27,16 @@ public class CaseEvent {
     public static final String START_TIME = "ch_start_time";
     public static final String END_TIME = "ch_end_time";
     public static final String ACTIVITY = "ch_name";
+    public static final String ROLE = "QueueName";
+    public static final String CASE_NAME = "CmAcmCaseIdentifier";
 
     private HashMap<String, String> additionalAttribute;
 
-    public CaseEvent(CSVRecord record, HashMap<String, String> defaultAttributes) {
+    public CaseEvent(CSVRecord record, HashMap<String, String> defaultAttributes, String dateFormat, String targetDateFormat) {
         additionalAttribute = new HashMap<>();
         defaultAttributes.forEach((key, storedKey) -> {
             if (key.contains("TIME") || key.contains("time")) {
-                additionalAttribute.put(key, cleanDate(record.get(storedKey)));
+                additionalAttribute.put(key, cleanDate(record.get(storedKey), dateFormat, targetDateFormat));
             } else additionalAttribute.put(key, record.get(storedKey));
         });
     }
@@ -55,9 +60,27 @@ public class CaseEvent {
     }
 
 
-    private String cleanDate(String date) {
-        if (date.contains(",")) return date.substring(0, date.lastIndexOf(","));
-        return date.substring(0, date.lastIndexOf("."));
+    private String cleanDate(String date, String dateFormat, String targetDateFormat) {
+        String result = date;
+        Date eventDate;
+        SimpleDateFormat orignalFormat = new SimpleDateFormat(dateFormat);
+        try {
+            eventDate = orignalFormat.parse(result);
+            result = orignalFormat.format(eventDate);
+        } catch (ParseException e) {
+            System.out.println(dateFormat + date);
+            throw new RuntimeException(e);
+        }
+        if (targetDateFormat != null && !targetDateFormat.isEmpty()) {
+            SimpleDateFormat targetFormat = new SimpleDateFormat(targetDateFormat);
+            try {
+                eventDate = orignalFormat.parse(result);
+                result = targetFormat.format(eventDate);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return result;
     }
 
     public String getStatus() {

@@ -6,10 +6,10 @@ import org.mj.process.model.CaseEvent;
 import org.mj.process.model.CaseHistory;
 import org.mj.process.model.DataMining;
 import org.mj.process.model.DocumentRequest;
+import org.mj.process.tools.JSONTool;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,8 +39,9 @@ public class DataProcessingService {
         CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
         DocumentRequest documentRequest = new DocumentRequest();
         documentRequest.setEventLevel(levelEvent);
-        documentRequest.setEncoded64Bit(true);
-        documentRequest.setDateFormat("dd-MM-yyyy hh:mm:ss");
+        documentRequest.setEncodedFormat("BASE64");
+        documentRequest.setDateFormat("yyyy-MM-dd-hh.mm.ss");
+        documentRequest.setTargetDateFormat("dd-MM-yyyy hh:mm:ss");
         documentRequest.setCleanDate(true);
         documentRequest.setCleanIDAttribute(true);
         documentRequest.setCaseType("{E0BAC726-36D9-4BAB-A0AF-35478A5E9F93}");
@@ -50,7 +51,11 @@ public class DataProcessingService {
         });
         dataMining = dataProcessingService.GetContentProcess(path, delimiter);
         caseHistory.processData(dataMining, documentRequest);
-        caseHistory.augmentCaseDetails(properties, documentRequest.getDateFormat(), caseTypeService, false);
+        String dateFormat = documentRequest.getDateFormat();
+        if (documentRequest.getTargetDateFormat() != null && !documentRequest.getTargetDateFormat().isEmpty())
+            dateFormat = documentRequest.getTargetDateFormat();
+        caseHistory.augmentCaseDetails(properties, dateFormat, caseTypeService, false);
+        System.out.println(JSONTool.getMappingInfo(caseHistory.getHeaders(), true, documentRequest.getDateFormat()));
         dataProcessingService.save(caseHistory, pathOut);
     }
 
@@ -59,6 +64,7 @@ public class DataProcessingService {
         boolean lowerCase = false;
         BufferedReader brTest = new BufferedReader(new FileReader(path));
         String text = brTest.readLine();
+        String secondLine = brTest.readLine();
         brTest.close();
         String[] strArray = text.split(delimiter + "");
         int pos = 0;
@@ -69,7 +75,10 @@ public class DataProcessingService {
         lowerCase = Character.isLowerCase(strArray[0].charAt(pos));
         DataMining dataMining = new DataMining(lowerCase, quote);
         Reader in = new FileReader(path);
-        dataMining.setRecords(CSVFormat.EXCEL.withDelimiter(delimiter.charAt(0)).withSkipHeaderRecord().withHeader(strArray).parse(in));
+        if (secondLine.startsWith("\""))
+            dataMining.setRecords(CSVFormat.EXCEL.withDelimiter(delimiter.charAt(0)).withSkipHeaderRecord().withHeader(strArray).withQuote('”').parse(in));
+        else
+            dataMining.setRecords(CSVFormat.EXCEL.withDelimiter(delimiter.charAt(0)).withSkipHeaderRecord().withHeader(strArray).parse(in));
         dataMining.setHeaders(strArray);
         return dataMining;
     }
@@ -86,15 +95,6 @@ public class DataProcessingService {
             caseHistory.getEvents().forEach((id, caseEvent) -> {
 
                 try {
-
-                    if (myheaders.length != caseEvent.getValues().size()) {
-                        System.out.println("Difference header ");
-                        System.out.println(Arrays.toString(myheaders));
-                        System.out.println(caseEvent.getHeaders());
-                        System.out.println();
-                    }
-
-
                     printer.printRecord(caseEvent.getValues());
                     count.getAndIncrement();
                 } catch (IOException e) {

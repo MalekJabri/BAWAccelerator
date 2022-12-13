@@ -1,6 +1,9 @@
 package org.mj.process.pageController.config;
 
-import org.mj.process.model.*;
+import org.mj.process.model.CaseHistory;
+import org.mj.process.model.ConfigurationRequest;
+import org.mj.process.model.DataMining;
+import org.mj.process.model.DocumentRequest;
 import org.mj.process.model.generic.Attribute;
 import org.mj.process.model.servers.ConnectionRequest;
 import org.mj.process.service.ContentService;
@@ -19,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -38,6 +42,17 @@ public class UploadPageController {
 
     @GetMapping("/uploadFile")
     public String getUpload(HttpServletRequest request, HttpServletResponse response, Model model) {
+        DocumentRequest documentRequest = getDocumentRequest();
+        model.addAttribute("csvImport", documentRequest);
+        model.addAttribute("Levels", getEventsType());
+        model.addAttribute("message", "");
+        model.addAttribute("classAlert", "alert alert-success");
+        model.addAttribute("displayMessage", "display:none");
+        model.addAttribute("position", 1);
+        return "uploadDocument";
+    }
+
+    private DocumentRequest getDocumentRequest() {
         DocumentRequest documentRequest = new DocumentRequest();
         if (initValue) {
             documentRequest.setFilePath("/Users/jabrimalek/Project/lalux/BAW_DATA/CH_CASEHIST.csv");
@@ -46,15 +61,9 @@ public class UploadPageController {
             documentRequest.setCleanDate(true);
             documentRequest.setCleanIDAttribute(true);
             documentRequest.setAddInformation(true);
-            documentRequest.setEncoded64Bit(true);
+            documentRequest.setEncodedFormat("HEX");
         }
-        model.addAttribute("csvImport", documentRequest);
-        model.addAttribute("Levels", getEventsType());
-        model.addAttribute("message", "");
-        model.addAttribute("classAlert", "alert alert-success");
-        model.addAttribute("displayMessage", "display:none");
-        model.addAttribute("position", 1);
-        return "uploadDocument";
+        return documentRequest;
     }
 
     @PostMapping("/uploadFile")
@@ -66,7 +75,8 @@ public class UploadPageController {
             logger.info("Download the file and save it to a path: " + path);
             documentRequest.setFilePath(ContentService.storeDocument("test", document, path, "csv"));
         } else if (documentRequest.getFilePath() == null || documentRequest.getFilePath().isEmpty()) {
-            model.addAttribute("csvImport", new DocumentRequest());
+            model.addAttribute("csvImport", getDocumentRequest());
+            model.addAttribute("Levels", getEventsType());
             model.addAttribute("message", "Please complete the path or add a file");
             model.addAttribute("classAlert", "alert alert-warning");
             model.addAttribute("displayMessage", "");
@@ -76,13 +86,15 @@ public class UploadPageController {
             DataProcessingService dataProcessingService = new DataProcessingService();
             DataMining dataMining = dataProcessingService.GetContentProcess(documentRequest.getFilePath(), documentRequest.getDelimiter());
             CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
+            System.out.println(Arrays.toString(dataMining.getHeaders()));
             caseHistory.init(dataMining, documentRequest);
             caseTypes = caseHistory.getCaseAttribute();
             dataMining = null;
         } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("csvImport", new DocumentRequest());
-            model.addAttribute("message", "Issue with the file! please check the logs");
+            model.addAttribute("csvImport", getDocumentRequest());
+            model.addAttribute("Levels", getEventsType());
+            model.addAttribute("message", "Issue with the file! please check the logs : " + e.getLocalizedMessage());
             model.addAttribute("classAlert", "alert alert-warning");
             model.addAttribute("displayMessage", "");
             return "uploadDocument";

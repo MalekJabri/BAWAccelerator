@@ -7,6 +7,7 @@ import com.ibm.mj.processmining.ProcessInquiryManagementApi;
 import com.ibm.mj.processmining.model.*;
 import org.mj.process.model.generic.Attribute;
 import org.mj.process.model.servers.ProcessMiningServer;
+import org.mj.process.tools.JSONTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,6 @@ public class ProcessMiningService {
         processMiningServer.setUserID("malek.jabri");
         processMiningServer.setApikey("fct2ul8nt4otv1kg");
         ApiClient apiClient = processMiningService.getDefaultClient(processMiningServer);
-
         processMiningService.uploadData(apiClient, "pqmalek", "465d35ee", "documents-compiled.csv", false);
     }
 
@@ -90,6 +90,17 @@ public class ProcessMiningService {
         logger.info("Project information :" + project);
         return project.getSuccess();
     }
+
+    public void createLog(String projectKey, String org, ApiClient apiClient, String[] headers, boolean augmented, String dateFormat) {
+        ProcessInquiryManagementApi processInquiryManagementApi = new ProcessInquiryManagementApi(apiClient);
+        Boolean forUpdate = true;
+        String mapping = JSONTool.getMappingInfo(headers, augmented, dateFormat);
+        logger.info("Mapping details ");
+        logger.info(mapping);
+        StringResponse result = processInquiryManagementApi.performProcessMining(projectKey, org, null, null, null, forUpdate, mapping);
+        logger.info("Result for the mapping " + result);
+    }
+
 
     /*
      Upload the data for a project using a path

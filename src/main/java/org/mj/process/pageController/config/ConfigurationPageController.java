@@ -1,7 +1,10 @@
 package org.mj.process.pageController.config;
 
 import com.ibm.casemgmt.api.CaseType;
-import org.mj.process.model.*;
+import org.mj.process.model.CaseHistory;
+import org.mj.process.model.ConfigurationRequest;
+import org.mj.process.model.DataMining;
+import org.mj.process.model.DocumentRequest;
 import org.mj.process.model.servers.ConnectionRequest;
 import org.mj.process.pageController.config.baw.CaseServerPageController;
 import org.mj.process.service.CaseTypeService;
@@ -14,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -53,13 +55,11 @@ public class ConfigurationPageController {
     }
 
     private void preparationCSV(HttpSession session, ConfigurationRequest configurationRequest) {
-        logger.warning("properties Selected " + configurationRequest.getProperties().length);
-        logger.warning(Arrays.toString(configurationRequest.getProperties()));
         DocumentRequest documentRequest = (DocumentRequest) session.getAttribute("documentRequest");
         ConnectionRequest connectionRequest = (ConnectionRequest) session.getAttribute("connectionRequest");
         CaseTypeService caseTypeService = null;
         if (connectionRequest != null) {
-            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
+            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBawContentServer());
             caseTypeService = new CaseTypeService(serverConfig);
             CaseType caseType = caseTypeService.getCaseTypeByName(configurationRequest.getCaseType());
             documentRequest.setCaseType(caseType.getId().toString());
@@ -75,14 +75,18 @@ public class ConfigurationPageController {
             caseHistory.processData(dataMining, documentRequest);
             logger.info("The case type " + configurationRequest.getCaseType() + " has " + caseHistory.getEvents().size() + " events");
             if (documentRequest.isAddInformation() && configurationRequest.getProperties() != null && configurationRequest.getProperties().length > 0) {
+                String dateFormat = documentRequest.getDateFormat();
+                if (documentRequest.getTargetDateFormat() != null && !documentRequest.getTargetDateFormat().isEmpty())
+                    dateFormat = documentRequest.getTargetDateFormat();
                 logger.info("Add Additional information from BAW Server");
                 List<String> properties = new ArrayList<>();
                 for (String prop : configurationRequest.getProperties()) properties.add(prop);
                 properties.add("CmAcmCaseIdentifier");
-                caseHistory.augmentCaseDetails(properties, documentRequest.getDateFormat(), caseTypeService, false);
+                caseHistory.augmentCaseDetails(properties, dateFormat, caseTypeService, false);
                 logger.info("The number of event is " + caseHistory.getEvents().size());
             }
             dataProcessingService.save(caseHistory, path + "-compiled" + ".csv");
+            session.setAttribute("headerCSV", caseHistory.getHeaders());
             session.setAttribute("finalDoc", path + "-compiled" + ".csv");
             dataMining = null;
             logger.info("Preparation CSV ended");

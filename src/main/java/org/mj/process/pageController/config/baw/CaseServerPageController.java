@@ -1,6 +1,9 @@
 package org.mj.process.pageController.config.baw;
 
-import org.mj.process.model.*;
+import org.mj.process.model.CaseHistory;
+import org.mj.process.model.ConfigurationRequest;
+import org.mj.process.model.DataMining;
+import org.mj.process.model.DocumentRequest;
 import org.mj.process.model.generic.Attribute;
 import org.mj.process.model.servers.ConnectionRequest;
 import org.mj.process.restController.CaseController;
@@ -44,7 +47,7 @@ public class CaseServerPageController {
         DocumentRequest documentRequest = (DocumentRequest) session.getAttribute("documentRequest");
         ServerConfig serverConfig;
         try {
-            serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
+            serverConfig = new ServerConfig(connectionRequest.getBawContentServer());
             logger.info("The object store is  " + serverConfig.getOs().get_Name());
         } catch (Exception e) {
             model.addAttribute("message", "Connection to server failed, please verify parameters");
@@ -62,8 +65,8 @@ public class CaseServerPageController {
             logger.info("The number of case type found in the CSV is " + caseHistory.getCaseTypes().size());
             CaseTypeService caseTypeService = new CaseTypeService(serverConfig);
             //  model.addAttribute("CaseTypes", caseTypeService.getAttributesForCaseTypes(caseTypes));
-            //   model.addAttribute("Solutions", caseTypeService.getAttributesForCaseSolution(caseTypes));
-            model.addAttribute("Solutions", caseTypeService.getAttributesSolutions());
+            model.addAttribute("Solutions", caseTypeService.getAttributesForCaseSolution(caseHistory.getCaseTypes().keySet()));
+            //  model.addAttribute("Solutions", caseTypeService.getAttributesSolutions());
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("message", "Connection to server failed, please verify parameters");
@@ -94,7 +97,7 @@ public class CaseServerPageController {
     public String GetPropertyList(HttpSession session, Model model, @RequestParam(name = "caseType", required = true) String caseTypeID, @RequestParam(name = "solution", required = true) String solution) {
         logger.info("Get properties caseType " + caseTypeID + " -- Solution " + solution);
         ConnectionRequest connectionRequest = (ConnectionRequest) session.getAttribute("connectionRequest");
-        ServerConfig serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
+        ServerConfig serverConfig = new ServerConfig(connectionRequest.getBawContentServer());
         ConfigurationRequest configurationRequest = new ConfigurationRequest();
         configurationRequest.setCaseType(caseTypeID);
         configurationRequest.setSolution(solution);

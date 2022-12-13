@@ -43,15 +43,17 @@ public class XmlParserTool {
         return attributes;
     }
 
-    public static Map<String, String> getPropertiesFromXML(String text, boolean encoded, String dateFormat) {
+    public static Map<String, String> getPropertiesFromXML(String text, String encoded, String dateFormat) {
         Map<String, String> propertiesList = new HashMap<>();
         for (String attName : getAttributes()) {
             propertiesList.put(attName, "");
         }
         try {
             String xmlContent;
-            if (encoded) {
+            if (encoded.equals("BASE64")) {
                 xmlContent = Base64Tools.decode(text);
+            } else if (encoded.equals("HEX")) {
+                xmlContent = HexTools.decode(text);
             } else {
                 xmlContent = text;
             }

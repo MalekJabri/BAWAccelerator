@@ -52,7 +52,7 @@ public class CreateQueryPageController {
     public String connectToServer(HttpSession session, HttpServletResponse response, Model model, ConnectionRequest connectionRequest) {
         ServerConfig serverConfig;
         try {
-            serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
+            serverConfig = new ServerConfig(connectionRequest.getBawContentServer());
             logger.info("The object store is  " + serverConfig.getOs().get_Name());
         } catch (Exception e) {
             model.addAttribute("message", "Connection to server failed, please verify parameters");

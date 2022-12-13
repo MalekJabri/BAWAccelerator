@@ -1,8 +1,8 @@
 package org.mj.process.service;
 
+import org.mj.process.model.servers.BAWContentServer;
 import org.mj.process.model.servers.ConnectionRequest;
 import org.mj.process.model.servers.ProcessMiningServer;
-import org.mj.process.model.servers.BAWContentServer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +35,7 @@ public class LocalPropertiesTools {
     public ConnectionRequest getConnectionRequest() {
         ConnectionRequest connectionRequest = new ConnectionRequest();
         if (checkFile()) {
-            connectionRequest.setBAWContentServer(getBAWServerAccess());
+            connectionRequest.setBawContentServer(getBAWServerAccess());
             connectionRequest.setProcessMiningServer(getProcessMiningServer());
         }
         return connectionRequest;

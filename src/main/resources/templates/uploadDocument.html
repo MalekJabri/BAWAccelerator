@@ -124,17 +124,22 @@
                             </div>
                             <hr class="mb-4">
                             <h4 class="mb-3">Transform:</h4>
-                            <div class="=row">
+                            <div class="row">
                                 <div class="col-md-6 ">
-                                    <label for="DateFormat">Date format</label>
-                                    <input class="form-control" id="DateFormat" placeholder="dd/MM/yyyy hh:mm:ss"
-                                           th:field="${csvImport.dateFormat}" type="text"
-                                           value="">
+                                    <label for="dateFormat">Date format present in CSV</label>
+                                    <input class="form-control" id="dateFormat" placeholder="dd/MM/yyyy hh:mm:ss"
+                                           th:field="${csvImport.dateFormat}" type="text" value="dd/MM/yyyy hh:mm:ss">
+                                </div>
+                                <div class="col-md-6 ">
+                                    <label for="targetDateFormat">Target Date format</label>
+                                    <input class="form-control" id="targetDateFormat" placeholder="dd/MM/yyyy hh:mm:ss"
+                                           th:field="${csvImport.targetDateFormat}" type="text"
+                                           value="dd/MM/yyyy hh:mm:ss">
                                 </div>
                             </div>
                             <hr class="mb-4">
                             <h4 class="mb-3">Add additional information:</h4>
-                            <div class="=row">
+                            <div class="row">
                                 <div class="col-md-6 ">
                                     <div class="custom-control custom-checkbox">
                                         <input class="custom-control-input" id="addInformation"
@@ -143,17 +148,27 @@
                                             case properties</label>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="=row">
                                 <div class="col-md-6 ">
-                                    <div class="custom-control custom-checkbox">
-                                        <input class="custom-control-input" id="ChContent"
-                                               th:field="${csvImport.encoded64Bit}" type="checkbox">
-                                        <label class="custom-control-label" for="ChContent">Encoded 64bit
-                                        </label>
+                                    <div class="custom-control custom-radio">
+                                        <input checked class="custom-control-input" id="None" name="encryptionMethod"
+                                               required th:field="${csvImport.encodedFormat}"
+                                               type="radio" value="NONE">
+                                        <label class="custom-control-label" for="None">None</label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                        <input class="custom-control-input" id="HEX" name="encryptionMethod" required
+                                               th:field="${csvImport.encodedFormat}" type="radio" value="HEX">
+                                        <label class="custom-control-label" for="HEX">HEX</label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                        <input class="custom-control-input" id="base64" name="encryptionMethod"
+                                               required th:field="${csvImport.encodedFormat}" type="radio"
+                                               value="BASE64">
+                                        <label class="custom-control-label" for="base64">Base 64</label>
                                     </div>
                                 </div>
                             </div>
+
                             <hr class="mb-4">
                             <div class="row">
                                 <div class="col-md-12 ">
