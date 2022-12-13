@@ -24,8 +24,6 @@ import java.util.logging.Logger;
 public class ConfigurationPageController {
 
     private static Logger logger = Logger.getLogger(CaseServerPageController.class.getName());
-    @Value("${process-mining.default-value}")
-    private boolean initValue;
     @Value("${spring.servlet.multipart.location}")
     private String path;
 

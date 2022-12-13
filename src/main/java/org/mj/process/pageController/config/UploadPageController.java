@@ -61,7 +61,7 @@ public class UploadPageController {
             documentRequest.setCleanDate(true);
             documentRequest.setCleanIDAttribute(true);
             documentRequest.setAddInformation(true);
-            documentRequest.setEncodedFormat("HEX");
+            documentRequest.setEncodedFormat("BASE64");
         }
         return documentRequest;
     }

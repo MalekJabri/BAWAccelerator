@@ -22,17 +22,7 @@ import java.util.Set;
 @Service
 public class ProcessMiningService {
     private static final Logger logger = LoggerFactory.getLogger(ProcessMiningService.class);
-
-    public static void main(String[] args) {
-        ProcessMiningService processMiningService = new ProcessMiningService();
-        ProcessMiningServer processMiningServer = new ProcessMiningServer();
-        processMiningServer.setUrl("https://raffaello.my-invenio.com");
-        processMiningServer.setUserID("malek.jabri");
-        processMiningServer.setApikey("fct2ul8nt4otv1kg");
-        ApiClient apiClient = processMiningService.getDefaultClient(processMiningServer);
-        processMiningService.uploadData(apiClient, "pqmalek", "465d35ee", "documents-compiled.csv", false);
-    }
-
+    
     public ApiClient getDefaultClient(ProcessMiningServer processMiningServer) {
         ApiClient defaultClient = new ApiClient();
         defaultClient.setBasePath(processMiningServer.getUrl());

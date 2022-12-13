@@ -27,8 +27,6 @@ public class GeneratePageController {
     private static Logger logger = Logger.getLogger(CaseServerPageController.class.getName());
     @Value("${spring.servlet.multipart.location}")
     private String pathDocument;
-    @Value("${process-mining.default-value}")
-    private boolean initValue;
 
     @GetMapping("/download")
     public ResponseEntity downloadFileFromLocal(HttpSession session) throws FileNotFoundException, MalformedURLException {
