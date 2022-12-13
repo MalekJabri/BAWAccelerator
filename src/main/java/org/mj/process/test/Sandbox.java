@@ -1,4 +1,4 @@
-package org.mj.process;
+package org.mj.process.test;
 
 import com.filenet.api.core.IndependentObject;
 import com.ibm.casemgmt.api.Case;

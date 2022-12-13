@@ -25,59 +25,74 @@
 <div class="container">
     <div class="py-5 text-center">
         <img alt="IBM" class="d-block mx-auto mb-4" height="72"
-             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy0X1V2RhRy2o3Z7_kQktyYZKoYAHUksXivJJg1CSn&s"
+             src="/assets/img/processmining.png"
              width="72">
         <h2>Configuration form</h2>
         <p class="lead">Below is the form to configure process mining project.</p>
     </div>
-    <div role="alert"
-         th:class="${classAlert}" th:style="${displayMessage}"><span th:text="${message}"></span></div>
+    <div th:class="${classAlert}"
+         role="alert" th:style="${displayMessage}" ><span th:text="${message}"></span></div>
 
 
     <div class="container">
         <div id="app">
             <step-navigation :currentstep=2 :steps="steps"></step-navigation>
-            <form enctype="multipart/form-data" method="post" th:action="@{/testConnection}"
-                  th:object="${connectionRequest}">
+            <form method="post" th:object="${connectionRequest}" th:action="@{/testConnection}"  enctype="multipart/form-data">
+            <div class="col-md-12 order-md-1">
+                    <h4 class="mb-3">Filenet server</h4>
+                        <div class="row">
 
-                <div class="col-md-12 order-md-1">
-                    <h4 class="mb-3">Process mining server</h4>
-                    <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username">UserName</label>
+                                <input class="form-control" id="username" placeholder="admin" th:field="${connectionRequest.getBAWContentServer.user}" required type="text" >
+                                <div class="invalid-feedback">
+                                    Valid first name is required.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password">Password</label>
+                                <input class="form-control" id="password" placeholder="*******" th:field="${connectionRequest.getBAWContentServer.password}" th:value="${connectionRequest.getBAWContentServer.password}" required type="text">
+                                <div class="invalid-feedback">
+                                    Valid last name is required.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 ">
+                                <label for="hostname">Hostname <span class="text-muted">(ip/hostname)</span></label>
+                                <input class="form-control" id="hostname" placeholder="filenet server" th:field="${connectionRequest.getBAWContentServer.server}" required
+                                       type="text">
+                                <div class="invalid-feedback">
+                                    Please enter a valid hostname or IP address for target object store updates.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row " style="padding-top: 20px">
+                            <div class="col-md-6 mb-3">
+                                <label for="objectStore">Repository</span></label>
+                                <input class="form-control" id="objectStore" placeholder="TOS" th:field="${connectionRequest.getBAWContentServer.repository}" required
+                                       type="text">
+                                <div class="invalid-feedback">
+                                    Please enter a valid Object Store / repository
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="port">Port</span></label>
+                                <input class="form-control" id="port" placeholder="9080" th:field="${connectionRequest.getBAWContentServer.port}" required
+                                       type="text">
+                                <div class="invalid-feedback">
+                                    Port
+                                </div>
+                            </div>
+                        </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="userID">UserName</label>
-                            <input class="form-control" id="userID" placeholder="admin"
-                                   required th:field="${connectionRequest.processMiningServerRequest.userID}"
-                                   type="text">
-                            <div class="invalid-feedback">
-                                Valid first name is required.
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="apiKey">Password</label>
-                            <input class="form-control" id="apiKey"
-                                   required th:field="${connectionRequest.processMiningServerRequest.apikey}"
-                                   type="text">
-                            <div class="invalid-feedback">
-                                Valid last name is required.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 ">
-                            <label for="url">URL<span class="text-muted">(ip/hostname)</span></label>
-                            <input class="form-control" id="url" placeholder="url server"
-                                   required th:field="${connectionRequest.processMiningServerRequest.url}"
-                                   type="text">
-                            <div class="invalid-feedback">
-                                Please enter url for process mining server.
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="mb-3">
-                    <button class="btn btn-primary" type="submit">Connect to Process mining</button>
                 </div>
-
+                <hr class="mb-4">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <button type="submit" class="btn btn-primary" ><i class="fa fa-arrow-right" style="padding-right: 5px"></i> Next Step</button>
+                    </div>
+                </div>
             </form>
             <step :currentstep="currentstep" :key="step.id" :step="step" :stepcount="steps.length"
                   @step-change="stepChanged"
@@ -100,7 +115,7 @@
                 </li>
             </script>
 
-
+            
         </div>
     </div>
 

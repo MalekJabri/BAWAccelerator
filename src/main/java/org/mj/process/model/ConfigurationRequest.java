@@ -8,5 +8,6 @@ public class ConfigurationRequest {
     String solution;
     String level;
     String[] properties;
+    boolean saveInProcessMining;
 
 }

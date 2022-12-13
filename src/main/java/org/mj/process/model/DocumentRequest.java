@@ -5,11 +5,13 @@ import lombok.Data;
 
 @Data
 public class DocumentRequest {
-
     String filePath;
     boolean cleanDate;
     String delimiter;
     boolean cleanIDAttribute;
-    String DateFormat;
+    String dateFormat;
     boolean addInformation;
+    boolean encoded64Bit;
+    String eventLevel;
+    String caseType;
 }

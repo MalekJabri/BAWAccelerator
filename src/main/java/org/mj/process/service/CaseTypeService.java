@@ -15,7 +15,7 @@ import com.ibm.casemgmt.api.objectref.ObjectStoreReference;
 import com.ibm.casemgmt.api.properties.CaseMgmtProperty;
 import com.ibm.mj.core.ceObject.PropertiesTool;
 import lombok.Data;
-import org.mj.process.model.Attribute;
+import org.mj.process.model.generic.Attribute;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,16 +42,16 @@ public class CaseTypeService {
     public List<Attribute> getAttributesForCaseTypes(Set<String> caseTypes) {
         List<Attribute> attributes = new ArrayList<>();
         for (String caseType : caseTypes) {
-            logger.info("Case Type info " + caseType);
+            logger.fine("Case Type info " + caseType);
             CaseType caseT = getCaseType(caseType);
             if (caseT != null) {
-                logger.info("compare : " + caseT.getId().toString() + " == " + caseType);
+                logger.fine("compare : " + caseT.getId().toString() + " == " + caseType);
                 if (caseT.getId().toString().equals(caseType)) {
                     attributes.add(new Attribute(caseT.getDisplayName(), caseType));
                 }
             }
         }
-        logger.info("The number of caseAttribute " + attributes.size());
+        logger.fine("The number of caseAttribute " + attributes.size());
         return attributes;
     }
 
@@ -76,7 +76,7 @@ public class CaseTypeService {
         String[] objectsStore = new String[1];
         objectsStore[0] = serverConfig.getOs().get_SymbolicName();
         List<DeployedSolution> solutions = DeployedSolution.fetchSolutions(serverConfig.getConnectionTool().getConnection().getURI(), objectsStore);
-        logger.info("Retrieved the solutions" + solutions.size() + " Solutions");
+        logger.fine("Retrieved the solutions" + solutions.size() + " Solutions");
         return solutions;
     }
 
@@ -98,6 +98,7 @@ public class CaseTypeService {
         DeployedSolution solution = DeployedSolution.fetchInstance(objectStoreReference, solutionName);
         for (CaseType caseType : solution.getCaseTypes()) {
             attributes.add(new Attribute(caseType.getDisplayName(), caseType.getName()));
+            System.out.println(caseType.getDisplayName() + " - " + caseType.getId() + " -- " + caseType.getName());
         }
         return attributes;
     }
@@ -123,6 +124,17 @@ public class CaseTypeService {
         return attributes;
     }
 
+    public CaseType getCaseTypeByName(String name) {
+        CaseType caseType = null;
+        try {
+            caseType = CaseType.fetchInstance(objectStoreReference, name);
+            logger.info("Case type " + caseType.getDisplayName() + " with the id " + name);
+        } catch (com.ibm.casemgmt.api.exception.CaseMgmtException e) {
+            logger.warning("Case type for the name not found " + name);
+        }
+        return caseType;
+    }
+
     public CaseType getCaseType(String id) {
         CaseType caseType = null;
         try {
@@ -136,20 +148,19 @@ public class CaseTypeService {
 
     public Case getCase(String caseID, List<String> propertiesFilter) {
         Case caseInstance = Case.fetchInstance(objectStoreReference, new Id(caseID), PropertiesTool.getPropertyFilter(propertiesFilter, true), null);
-        logger.info("Retrieved the cases " + caseInstance.getIdentifier());
-
+        logger.fine("Retrieved the cases " + caseInstance.getIdentifier());
         return caseInstance;
     }
 
     public HashMap<String, String> GetPropertiesForCaseType(CaseType caseType, boolean customProp) {
-        logger.info(" ------- ");
+        logger.fine(" ------- ");
         String prefix = "---";
         if (customProp) prefix = caseType.getName().substring(0, caseType.getName().indexOf("_"));
         ClassDefinition caseTypeClass = Factory.ClassDefinition.fetchInstance(serverConfig.getOs(), caseType.getName(), null);
         HashMap<String, String> properties = new HashMap<>();
         for (int i = 0; i < caseTypeClass.get_PropertyDefinitions().size(); i++) {
             PropertyDefinition propertyDefinition = (PropertyDefinition) caseTypeClass.get_PropertyDefinitions().get(i);
-            logger.info(propertyDefinition.get_DisplayName() + " ---  " + propertyDefinition.get_SymbolicName());
+            logger.finest(propertyDefinition.get_DisplayName() + " ---  " + propertyDefinition.get_SymbolicName());
             if (customProp) {
                 if (propertyDefinition.get_SymbolicName().startsWith(prefix))
                     properties.put(propertyDefinition.get_DisplayName(), propertyDefinition.get_SymbolicName());
@@ -161,7 +172,7 @@ public class CaseTypeService {
     }
 
     public HashMap<String, String> getProperties(Case caseInstance, String dateFormat, boolean displayName) {
-        logger.info("Retrieve properties for case " + caseInstance.getIdentifier());
+        logger.fine("Retrieve properties for case " + caseInstance.getIdentifier());
         HashMap<String, String> properties = new HashMap<>();
         SimpleDateFormat format = new SimpleDateFormat(dateFormat);
         List<CaseMgmtProperty> listCase = caseInstance.getProperties().asList();
@@ -174,7 +185,7 @@ public class CaseTypeService {
             if (displayName) properties.put(caseProperty.getDisplayName(), value);
             else properties.put(caseProperty.getSymbolicName(), value);
         }
-        logger.info("Retrieved " + properties.size() + " properties for case " + caseInstance.getIdentifier());
+        logger.finest("Retrieved " + properties.size() + " properties for case " + caseInstance.getIdentifier());
         return properties;
     }
 

@@ -32,7 +32,7 @@
 <div class="container">
     <div class="py-5 text-center">
         <img alt="IBM" class="d-block mx-auto mb-4" height="72"
-             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy0X1V2RhRy2o3Z7_kQktyYZKoYAHUksXivJJg1CSn&s"
+             src="/assets/img/processmining.png"
              width="72">
         <h2>Configuration form</h2>
         <p class="lead">Below is the form to configure process mining project.</p>
@@ -52,59 +52,28 @@
                   th:object="${configurationRequest}">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="Level">Solutions</label>
-                        <select class="custom-select d-block w-100" id="caseSolution"
-                                required th:field="${configurationRequest.solution}">
-                            <option selected value="">-- Solution--</option>
-                            <option th:each="solution : ${Solutions}"
-                                    th:text="${solution.display}"
-                                    th:value="${solution.value}">
-                            </option>
-                        </select>
-                        <div class="invalid-feedback">
-                            Solutions
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
                         <label for="CaseType">CaseType</label>
                         <select class="custom-select d-block w-100" id="CaseType" required
                                 th:field="${configurationRequest.caseType}">
-
-                        </select>
-                        <div class="invalid-feedback">
-                            Please select a valid country.
-                        </div>
-                    </div>
-                </div>
-                <hr class="mb-4">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="Level">Level</label>
-                        <select class="custom-select d-block w-100" id="Level"
-                                th:field="${configurationRequest.level}">
-                            <option th:each="level : ${Levels}"
-                                    th:text="${level.display}"
-                                    th:value="${level.value}">
+                            <option th:each="caseType : ${CaseTypes}"
+                                    th:text="${caseType.display}"
+                                    th:value="${caseType.value}">
                             </option>
                         </select>
                         <div class="invalid-feedback">
-                            Please provide a valid state.
+                            Please select a valid case type.
                         </div>
                     </div>
                 </div>
                 <hr class="mb-4">
-                <div class="col-md-12 " id="PropertySection" th:style="${displayProperty}">
-                    <label for="Level">Properties</label>
-                    <pre class="dlb1"></pre>
-                    <select class="caseProperties" id="caseProperties" multiple
-                            th:field="${configurationRequest.properties}">
-                        <option value="aaaa">Empty</option>
-                    </select>
-                </div>
-                <hr class="mb-4">
                 <div class="row">
-                    <div class="col-md-12 ">
-                        <button class="btn btn-primary" type="submit">Generate CSV</button>
+                    <div class="col-md-6 ">
+                        <button class="btn btn-primary" name="action" type="submit" value="generate">Generate CSV
+                        </button>
+                    </div>
+                    <div class="col-md-6 ">
+                        <button class="btn btn-secondary" name="action" type="submit" value="publish">Publish to PM
+                        </button>
                     </div>
                 </div>
             </form>
@@ -130,8 +99,6 @@
                             v-text="step.title"></span></div>
                 </li>
             </script>
-
-
         </div>
     </div>
 
@@ -184,26 +151,6 @@
     })();
 </script>
 <script>
-    $('#caseSolution').change(
-        function () {
-            console.log("Call rest api to retrieve the list of case type for a solution");
-            console.log("The solution is " + $(this).val());
-            $.getJSON("/api/core/caseTypes", {
-                solution: $(this).val(),
-                ajax: 'true'
-            }, function (data) {
-                var html = '<option value="">-- case type --</option>';
-                var len = data.length;
-                for (var i = 0; i < len; i++) {
-                    html += '<option value="' + data[i].value + '">'
-                        + data[i].display + '</option>';
-                }
-                html += '</option>';
-                $('#CaseType').html(html);
-
-            });
-        }
-    );
     $('#CaseType').change(
         function () {
             console.log("Call rest api to retrieve the list of properties for the case type");
@@ -231,8 +178,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.8.1/prism.min.js"></script>
 <script src="/dual/dist/dual-listbox.js"></script>
 <script src="/toolsScript.js"></script>
-<script>
-    var dlb1;
-</script>
 </body>
 </html>

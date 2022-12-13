@@ -2,8 +2,8 @@ package org.mj.process.restController;
 
 import com.ibm.casemgmt.api.CaseType;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.mj.process.model.Attribute;
-import org.mj.process.model.ConnectionRequest;
+import org.mj.process.model.generic.Attribute;
+import org.mj.process.model.servers.ConnectionRequest;
 import org.mj.process.service.CaseTypeService;
 import org.mj.process.service.ServerConfig;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +29,7 @@ public class CaseController {
             logger.warning("The connection request is empty");
         } else {
             logger.info("The connection request has been found");
-            ServerConfig serverConfig = new ServerConfig(connectionRequest.getFileNetServerRequest());
+            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
             CaseTypeService caseTypeService = new CaseTypeService(serverConfig);
             CaseType caseType = caseTypeService.getCaseType(caseTypeID);
             HashMap<String, String> values = caseTypeService.GetPropertiesForCaseType(caseType, true);
@@ -50,7 +50,7 @@ public class CaseController {
             logger.warning("The connection request is empty");
         } else {
             logger.info("The connection request has been found");
-            ServerConfig serverConfig = new ServerConfig(connectionRequest.getFileNetServerRequest());
+            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
             CaseTypeService caseTypeService = new CaseTypeService(serverConfig);
             caseTypes = caseTypeService.getAttributesCaseType(solution);
             logger.info("list attributes for the case type");
@@ -68,7 +68,7 @@ public class CaseController {
             logger.warning("The connection request is empty");
         } else {
             logger.info("The connection request has been found");
-            ServerConfig serverConfig = new ServerConfig(connectionRequest.getFileNetServerRequest());
+            ServerConfig serverConfig = new ServerConfig(connectionRequest.getBAWContentServer());
             CaseTypeService caseTypeService = new CaseTypeService(serverConfig);
             caseTypes = caseTypeService.getAttributesIDCaseType(solution);
             logger.info("list attributes for the case type");

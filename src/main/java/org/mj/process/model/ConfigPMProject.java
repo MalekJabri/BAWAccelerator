@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class ConfigPMProject {
     String projectName;
-    String OrgID;
-    String OrgName;
+    String orgID;
+    String orgName;
     Boolean uploadData;
     Boolean append;
 }

@@ -1,4 +1,4 @@
-package org.mj.process.model;
+package org.mj.process.model.generic;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,11 +1,14 @@
 package org.mj.process.pageController.config.processMining;
 
 import com.ibm.mj.ApiClient;
-import org.mj.process.model.Attribute;
+import com.ibm.mj.processmining.model.ProcessInfo;
+import org.mj.process.model.generic.Attribute;
 import org.mj.process.model.ConfigPMProject;
-import org.mj.process.model.ConnectionRequest;
+import org.mj.process.model.servers.ConnectionRequest;
 import org.mj.process.model.DocumentRequest;
+import org.mj.process.service.LocalPropertiesTools;
 import org.mj.process.service.ProcessMiningService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,25 +28,31 @@ public class ProcessMiningServerPageController {
     @Value("${process-mining.default-value}")
     private boolean initValue;
 
-    @GetMapping("/getPropertiesForCase")
+    @Autowired
+    private LocalPropertiesTools localPropertiesTools;
+
+    @GetMapping("/setProcessMiningServer")
     public String GetPropertyList(HttpSession session, Model model) {
-        //   model.addAttribute("Solutions", caseTypeService.getAttributesForCaseSolution(caseTypes));
-        model.addAttribute("connectionRequest", new ConnectionRequest());
+        ConnectionRequest connectionRequest = new ConnectionRequest();
+        if (initValue) connectionRequest = localPropertiesTools.getConnectionRequest();
+        model.addAttribute("connectionRequest", connectionRequest);
         model.addAttribute("message", "Configuration review");
         model.addAttribute("classAlert", "alert alert-success");
         model.addAttribute("displayMessage", "");
         model.addAttribute("displayProperty", "display:none");
-        return "configuration1";
+        return "processMining/connectToPM";
     }
 
     @PostMapping("/testConnectionPM")
     public String testConnectionProcessMining(HttpSession session, HttpServletResponse response, Model model, ConnectionRequest connectionRequest) {
-        DocumentRequest documentRequest = (DocumentRequest) session.getAttribute("documentRequest");
-        List<Attribute> organisations = new ArrayList<>();
+        List<Attribute> organisations;
         try {
+            // if (initValue) connectionRequest = localPropertiesTools.getConnectionRequest();
             ProcessMiningService processMiningService = new ProcessMiningService();
-            ApiClient apiClient = processMiningService.getDefaultClient(connectionRequest.getProcessMiningServerRequest());
-            organisations = processMiningService.getOrg(apiClient);
+            ApiClient apiClient = processMiningService.getDefaultClient(connectionRequest.getProcessMiningServer());
+            List<ProcessInfo> processInfos = processMiningService.listProjects(apiClient);
+            organisations = processMiningService.getOrg(processInfos);
+            session.setAttribute("projectsInfo", processInfos);
             logger.info("Apiclient :" + apiClient);
         } catch (Exception e) {
             model.addAttribute("message", "Connection to the process mining server failed, please verify parameters");
@@ -51,16 +60,16 @@ public class ProcessMiningServerPageController {
             model.addAttribute("classAlert", "alert alert-warning");
             model.addAttribute("displayMessage", "");
             e.printStackTrace();
-            return "connectToProcessMining";
+            return "processMining/connectToPM";
         }
         session.setAttribute("connectionRequest", connectionRequest);
-        model.addAttribute("message", "Successful connection to Filenet / Process mining");
+        model.addAttribute("message", "Successful connection toProcess mining");
         model.addAttribute("configPMProject", new ConfigPMProject());
         model.addAttribute("organisations", organisations);
         model.addAttribute("classAlert", "alert alert-success");
         model.addAttribute("displayMessage", "");
         model.addAttribute("position", 3);
-        return "configProcessProject";
+        return "processMining/configProcessProject";
     }
 
     @PostMapping("/publishProject")
@@ -70,8 +79,13 @@ public class ProcessMiningServerPageController {
         List<Attribute> organisations = new ArrayList<>();
         try {
             ProcessMiningService processMiningService = new ProcessMiningService();
-            ApiClient apiClient = processMiningService.getDefaultClient(connectionRequest.getProcessMiningServerRequest());
+            ApiClient apiClient = processMiningService.getDefaultClient(connectionRequest.getProcessMiningServer());
             boolean projectSuccess = processMiningService.createNewProject(configPMProject.getProjectName(), configPMProject.getOrgID(), apiClient);
+            ProcessInfo processInfo = processMiningService.getProject(apiClient, configPMProject.getProjectName());
+            if (configPMProject.getUploadData() && processInfo != null) {
+                String finalDoc = (String) session.getAttribute("finalDoc");
+                processMiningService.uploadData(apiClient, processInfo.getProjectName(), configPMProject.getOrgID(), finalDoc, configPMProject.getAppend());
+            }
             logger.info("Creation for the project :" + configPMProject.getProjectName() + "-->" + projectSuccess);
         } catch (Exception e) {
             model.addAttribute("message", "Connection to the process mining server failed, please verify parameters");
@@ -79,7 +93,7 @@ public class ProcessMiningServerPageController {
             model.addAttribute("classAlert", "alert alert-warning");
             model.addAttribute("displayMessage", "");
             e.printStackTrace();
-            return "connectToProcessMining";
+            return "processMining/connectToPM";
         }
         model.addAttribute("message", "Creation of the project " + configPMProject.getProjectName());
         model.addAttribute("configPMProject", configPMProject);
@@ -87,7 +101,7 @@ public class ProcessMiningServerPageController {
         model.addAttribute("classAlert", "alert alert-success");
         model.addAttribute("displayMessage", "");
         model.addAttribute("position", 3);
-        return "configProcessProject";
+        return "processMining/configProcessProject";
     }
 
 }

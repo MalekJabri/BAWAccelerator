@@ -5,8 +5,8 @@ import com.ibm.mj.ApiClient;
 import com.ibm.mj.processmining.AuthorizationApi;
 import com.ibm.mj.processmining.ProcessInquiryManagementApi;
 import com.ibm.mj.processmining.model.*;
-import org.mj.process.model.Attribute;
-import org.mj.process.model.ProcessMiningServerRequest;
+import org.mj.process.model.generic.Attribute;
+import org.mj.process.model.servers.ProcessMiningServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,27 +24,25 @@ public class ProcessMiningService {
 
     public static void main(String[] args) {
         ProcessMiningService processMiningService = new ProcessMiningService();
-        ProcessMiningServerRequest processMiningServerRequest = new ProcessMiningServerRequest();
-        processMiningServerRequest.setUrl("https://raffaello.my-invenio.com");
-        processMiningServerRequest.setUserID("malek.jabri");
-        processMiningServerRequest.setApikey("fct2ul8nt4otv1kg");
-        ApiClient apiClient = processMiningService.getDefaultClient(processMiningServerRequest);
-        List<Attribute> orgs = processMiningService.getOrg(apiClient);
-        logger.info("The number of organisation are " + orgs.size());
-        processMiningService.createNewProject("MalSecond6", "465d35ee", apiClient);
-        List<ProcessInfo> infos = processMiningService.listProjects(apiClient);
+        ProcessMiningServer processMiningServer = new ProcessMiningServer();
+        processMiningServer.setUrl("https://raffaello.my-invenio.com");
+        processMiningServer.setUserID("malek.jabri");
+        processMiningServer.setApikey("fct2ul8nt4otv1kg");
+        ApiClient apiClient = processMiningService.getDefaultClient(processMiningServer);
+
+        processMiningService.uploadData(apiClient, "pqmalek", "465d35ee", "documents-compiled.csv", false);
     }
 
-    public ApiClient getDefaultClient(ProcessMiningServerRequest processMiningServerRequest) {
+    public ApiClient getDefaultClient(ProcessMiningServer processMiningServer) {
         ApiClient defaultClient = new ApiClient();
-        defaultClient.setBasePath(processMiningServerRequest.getUrl());
+        defaultClient.setBasePath(processMiningServer.getUrl());
         AuthorizationApi apiInstance = new AuthorizationApi(defaultClient);
         TokenRequest token = new TokenRequest();
-        token.setApiKey(processMiningServerRequest.getApikey());
-        token.setUid(processMiningServerRequest.getUserID());
+        token.setApiKey(processMiningServer.getApikey());
+        token.setUid(processMiningServer.getUserID());
         SignResponse result = apiInstance.createToken(token);
         logger.info("Token  " + result.getSign());
-        logger.info("Authentication to the server for " + processMiningServerRequest.getUserID() + " is " + result.getSuccess());
+        logger.info("Authentication to the server for " + processMiningServer.getUserID() + " is " + result.getSuccess());
         defaultClient.setBearerToken(result.getSign());
         logger.info("Assigned bearer token to api client ");
         return defaultClient;
@@ -57,10 +55,19 @@ public class ProcessMiningService {
         return process.getData();
     }
 
-    public List<Attribute> getOrg(ApiClient apiClient) {
+    public ProcessInfo getProject(ApiClient apiClient, String projectTitle) {
+        ProcessInfo processInfo = null;
+        logger.info("Connect to Process mining using the following user ");
+        ProcessInquiryManagementApi processInquiryManagementApi = new ProcessInquiryManagementApi(apiClient);
+        ProcessesResponse process = processInquiryManagementApi.getProcessList("", "", "");
+        for (ProcessInfo info : process.getData()) if (info.getProjectTitle().equals(projectTitle)) return info;
+        return null;
+    }
+
+    public List<Attribute> getOrg(List<ProcessInfo> processInfos) {
         List<Attribute> attributes = new ArrayList<>();
         Set<String> sets = new HashSet<>();
-        for (ProcessInfo processInfo : listProjects(apiClient)) {
+        for (ProcessInfo processInfo : processInfos) {
             if (sets.add(processInfo.getOrganization())) {
                 Attribute attribute = new Attribute(processInfo.getOrganizationTitle(), processInfo.getOrganization());
                 attributes.add(attribute);
@@ -76,6 +83,10 @@ public class ProcessMiningService {
         projectRequest.setTitle(projectName);
         projectRequest.setOrg(OrgID);
         ProcessResponse project = processInquiryManagementApi.createNewProject("", "", "", projectRequest);
+        List<ProcessInfo> projects = processInquiryManagementApi.getProcessList(null, null, null).getData();
+        projects.forEach(processInfo -> {
+            logger.info(processInfo.getProjectName() + "-- " + processInfo.getProjectTitle());
+        });
         logger.info("Project information :" + project);
         return project.getSuccess();
     }
@@ -83,15 +94,15 @@ public class ProcessMiningService {
     /*
      Upload the data for a project using a path
      */
-    public boolean uploadData(ApiClient apiClient, String projectID, String OrgID, String caseType, String path) {
+    public boolean uploadData(ApiClient apiClient, String projectID, String OrgID, String path, boolean append) {
         StringResponse result = new StringResponse();
         result.setSuccess(false);
         ProcessInquiryManagementApi processInquiryManagementApi = new ProcessInquiryManagementApi(apiClient);
         String projectKey = projectID;
         String org = OrgID;
         Boolean forUpdate = true;
-        Boolean dataSetOverride = false;
-        String description = "Process flow the case type " + caseType;
+        Boolean dataSetOverride = !append;
+        String description = "Process flow the case type ";
         File _file = new File(path); // File |
         try {
             result = processInquiryManagementApi.uploadDataSet(projectKey, org, null, null, null, forUpdate, dataSetOverride, description, _file);

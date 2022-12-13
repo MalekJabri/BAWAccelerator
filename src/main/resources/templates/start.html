@@ -11,7 +11,7 @@
     <link href="/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet'>
     <link href="/style.css" rel="stylesheet">
-    <title>Process mining accelerator</title>
+    <title>Process Mining accelerator</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -30,59 +30,39 @@
         <h2>Configuration form</h2>
         <p class="lead">Below is the form to configure process mining project.</p>
     </div>
-    <div role="alert"
-         th:class="${classAlert}" th:style="${displayMessage}"><span th:text="${message}"></span></div>
 
 
-    <div class="container">
-        <div id="app">
-            <step-navigation :currentstep=4 :steps="steps"></step-navigation>
-
-            <h1>Download the file</h1>
-            <hr class="mb-4">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <form action="/download">
-                        <button class="btn btn-primary" type="submit">Download the cleaned file</button>
-                    </form>
-
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card" style="width: 100%;">
+                <img alt="Card image cap" class="card-img-top" src="/assets/img/createQuery.png">
+                <div class="card-body">
+                    <h5 class="card-title">Query Creation</h5>
+                    <p class="card-text">Connect to BAW, to prepare the query depending on the solution, case type and
+                        level</p>
+                    <a class="btn btn-primary" href="/connectToServer" role="button">
+                        <i class="fa fa-question" style="padding-right: 5px"></i>
+                        Create Query</a>
                 </div>
             </div>
-
-            <step :currentstep="currentstep" :key="step.id" :step="step" :stepcount="steps.length"
-                  @step-change="stepChanged"
-                  v-for="step in steps">
-            </step>
-
-            <script id="step-navigation-template" type="x-template">
-                <ol class="step-indicator">
-                    <li v-for="step in steps" is="step-navigation-step" :key="step.id" :step="step"
-                        :currentstep="currentstep">
-                    </li>
-                </ol>
-            </script>
-
-            <script id="step-navigation-step-template" type="x-template">
-                <li :class="indicatorclass">
-                    <div class="step"><i :class="step.icon_class"></i></div>
-                    <div class="caption hidden-xs hidden-sm">Step <span v-text="step.id"></span>: <span
-                            v-text="step.title"></span></div>
-                </li>
-            </script>
-
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card" style="width: 100%;">
+                <img alt="Card image cap" class="card-img-top" src="/assets/img/processPM.png">
+                <div class="card-body">
+                    <h5 class="card-title">CSV Augmentation </h5>
+                    <p class="card-text">Augment the case history result by adding additional attributes.</p>
+                    <a class="btn btn-primary" href="/uploadFile" role="button">
+                        <i class="fa fa-gears" style="padding-right: 5px"></i>
+                        Augment CSV</a>
+                </div>
+            </div>
 
         </div>
     </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
-        <div class="row" style="margin-bottom: 20px; margin-top: 20px">
-            <div class="col-md-12 " style="margin-top: 10px">
-                <a class="btn btn-success text-white" href="/" role="button">
-                    <i class="fa fa-home"></i>
-                    Home
-                </a>
-            </div>
-        </div>
+
         <p class="mb-1">&copy; 2022-2023 IBM</p>
         <ul class="list-inline">
             <li class="list-inline-item"><a href="#">Privacy</a></li>
@@ -95,13 +75,13 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src='/vue/2.4.4/vue.js'></script>
-<script src="/configScript.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script>window.jQuery || document.write('<script src="/assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
 <script src="/assets/js/vendor/popper.min.js"></script>
 <script src="/dist/js/bootstrap.min.js"></script>
 <script src="/assets/js/vendor/holder.min.js"></script>
-<script src="/toolsScript.js"></script>
 <script>
     // Example starter JavaScript for disabling form submissions if there are invalid fields
     (function () {

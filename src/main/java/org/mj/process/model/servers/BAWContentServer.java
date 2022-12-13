@@ -1,4 +1,4 @@
-package org.mj.process.model;
+package org.mj.process.model.servers;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Schema(name = "ServerECM", description = "the server where the document will be saved")
-public class FileNetServerRequest implements java.io.Serializable {
+public class BAWContentServer implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,5 +21,6 @@ public class FileNetServerRequest implements java.io.Serializable {
     private String password;
     @Schema(name = "repository", required = true, example = "tos")
     private String repository;
+    private boolean save;
 
 }

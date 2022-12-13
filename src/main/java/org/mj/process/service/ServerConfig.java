@@ -4,7 +4,7 @@ import com.filenet.api.core.ObjectStore;
 import com.ibm.mj.core.p8Connection.ConnectionTool;
 import com.ibm.mj.core.properties.MappingFieldsTool;
 import lombok.Data;
-import org.mj.process.model.FileNetServerRequest;
+import org.mj.process.model.servers.BAWContentServer;
 
 import java.util.logging.Logger;
 
@@ -20,7 +20,7 @@ public class ServerConfig {
         getconnection(objecStore, config);
     }
 
-    public ServerConfig(FileNetServerRequest config) {
+    public ServerConfig(BAWContentServer config) {
         getconnection(config.getRepository(), config);
     }
 
@@ -38,7 +38,7 @@ public class ServerConfig {
         logger.info("Start Connection based on the configuration " + info.getMappingValue(config + "_user") + " hosts " + info.getMappingValue(config + "_host"));
     }
 
-    public void getconnection(String to, FileNetServerRequest config) {
+    public void getconnection(String to, BAWContentServer config) {
         logger.info("Start Connection based on the configuration " + config);
         connectionTool = new ConnectionTool();
         connectionTool.establishConnection(config.getUser(), config.getPassword(), "FileNetP8WSI", "http://" + config.getServer() + ":9080/wsi/FNCEWS40MTOM");
