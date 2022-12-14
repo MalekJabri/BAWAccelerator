@@ -3,9 +3,11 @@ package org.mj.process.service;
 import org.mj.process.model.servers.BAWContentServer;
 import org.mj.process.model.servers.ConnectionRequest;
 import org.mj.process.model.servers.ProcessMiningServer;
+import org.mj.process.tools.ProtectedConfigFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -19,8 +21,6 @@ public class LocalPropertiesTools {
 
     public static void main(String[] args) throws IOException {
         LocalPropertiesTools localPropertiesTools = new LocalPropertiesTools();
-        String path = "config.properties";
-        String path1 = "config1.properties";
         BAWContentServer bawServer = localPropertiesTools.getBAWServerAccess();
         ProcessMiningServer processMiningServer = localPropertiesTools.getProcessMiningServer();
         localPropertiesTools.saveBawConfig(bawServer);
@@ -51,7 +51,12 @@ public class LocalPropertiesTools {
                 prop.load(input);
                 bawServer.setServer(prop.getProperty("baw.content.server"));
                 bawServer.setUser(prop.getProperty("baw.content.userName"));
-                bawServer.setPassword(prop.getProperty("baw.content.password"));
+                try {
+                    SecretKeySpec key = ProtectedConfigFile.getSecretKeySpec();
+                    bawServer.setPassword(ProtectedConfigFile.decrypt(prop.getProperty("baw.content.password"), key));
+                } catch (Exception e) {
+                    bawServer.setPassword(prop.getProperty("baw.content.password"));
+                }
                 bawServer.setRepository(prop.getProperty("baw.content.os"));
                 bawServer.setPort(prop.getProperty("baw.content.port"));
                 logger.info("Filenet Configuration " + bawServer);
@@ -71,7 +76,13 @@ public class LocalPropertiesTools {
                 prop.load(input);
                 processMiningServer.setUrl(prop.getProperty("pm.url"));
                 processMiningServer.setUserID(prop.getProperty("pm.userID"));
-                processMiningServer.setApikey(prop.getProperty("pm.apiKey"));
+                try {
+                    SecretKeySpec key = ProtectedConfigFile.getSecretKeySpec();
+                    processMiningServer.setApikey(ProtectedConfigFile.decrypt(prop.getProperty("pm.apiKey"), key));
+                } catch (Exception e) {
+                    processMiningServer.setApikey(prop.getProperty("pm.apiKey"));
+                }
+
                 logger.info("Process Mining configuration" + processMiningServer);
                 input.close();
             } catch (IOException ex) {
@@ -92,7 +103,12 @@ public class LocalPropertiesTools {
             // set the properties value
             prop.setProperty("baw.content.server", bawServer.getServer());
             prop.setProperty("baw.content.userName", bawServer.getUser());
-            prop.setProperty("baw.content.password", bawServer.getPassword());
+            try {
+                SecretKeySpec key = ProtectedConfigFile.getSecretKeySpec();
+                prop.setProperty("baw.content.password", ProtectedConfigFile.encrypt(bawServer.getPassword(), key));
+            } catch (Exception e) {
+                prop.setProperty("baw.content.password", bawServer.getPassword());
+            }
             prop.setProperty("baw.content.os", bawServer.getRepository());
             prop.setProperty("baw.content.port", bawServer.getPort());
             // save properties to project root folder
@@ -114,7 +130,13 @@ public class LocalPropertiesTools {
         try {
             OutputStream output = new FileOutputStream(configPath);
             // set the properties value
-            prop.setProperty("pm.apiKey", processMiningServer.getApikey());
+            try {
+                SecretKeySpec key = ProtectedConfigFile.getSecretKeySpec();
+                prop.setProperty("pm.apiKey", ProtectedConfigFile.encrypt(processMiningServer.getApikey(), key));
+            } catch (Exception e) {
+                prop.setProperty("pm.apiKey", processMiningServer.getApikey());
+            }
+
             prop.setProperty("pm.userID", processMiningServer.getUserID());
             prop.setProperty("pm.url", processMiningServer.getUrl());
             // save properties to project root folder
