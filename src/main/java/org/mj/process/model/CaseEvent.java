@@ -32,12 +32,23 @@ public class CaseEvent {
 
     private HashMap<String, String> additionalAttribute;
 
-    public CaseEvent(CSVRecord record, HashMap<String, String> defaultAttributes, String dateFormat, String targetDateFormat) {
+    public CaseEvent(CSVRecord record, HashMap<String, String> defaultAttributes, String dateFormat, String targetDateFormat, boolean cleanID) {
         additionalAttribute = new HashMap<>();
         defaultAttributes.forEach((key, storedKey) -> {
             if (key.contains("TIME") || key.contains("time")) {
-                additionalAttribute.put(key, cleanDate(record.get(storedKey), dateFormat, targetDateFormat));
-            } else additionalAttribute.put(key, record.get(storedKey));
+                String date = cleanDate(record.get(storedKey), dateFormat, targetDateFormat);
+                System.out.println(key + " -- " + date);
+                additionalAttribute.put(key, date);
+            }
+            if ((key.contains("id") || key.contains("ID")) && cleanID) {
+                String value = record.get(storedKey);
+                value = value.replace("{", "");
+                value = value.replace("}", "");
+                additionalAttribute.put(key, value);
+            } else {
+                additionalAttribute.put(key, record.get(storedKey));
+
+            }
         });
     }
 
@@ -61,6 +72,8 @@ public class CaseEvent {
 
 
     private String cleanDate(String date, String dateFormat, String targetDateFormat) {
+        String wrongDate = "31/12/9999 23:59:59";
+        String defaultFormat = "dd/MM/yyyy hh:mm:ss";
         String result = date;
         Date eventDate;
         SimpleDateFormat orignalFormat = new SimpleDateFormat(dateFormat);
@@ -68,7 +81,6 @@ public class CaseEvent {
             eventDate = orignalFormat.parse(result);
             result = orignalFormat.format(eventDate);
         } catch (ParseException e) {
-            System.out.println(dateFormat + date);
             throw new RuntimeException(e);
         }
         if (targetDateFormat != null && !targetDateFormat.isEmpty()) {
@@ -81,6 +93,14 @@ public class CaseEvent {
             }
         }
         return result;
+    }
+
+    boolean checkObsDate(Date eventDate) throws ParseException {
+        String wrongDate = "31/12/9999 23:59:59";
+        String defaultFormat = "dd/MM/yyyy hh:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(defaultFormat);
+        Date obsoloteDate = simpleDateFormat.parse(wrongDate);
+        return obsoloteDate.equals(eventDate);
     }
 
     public String getStatus() {

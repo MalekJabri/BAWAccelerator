@@ -3,6 +3,7 @@ package org.mj.process.service;
 
 import com.ibm.mj.ApiClient;
 import com.ibm.mj.processmining.AuthorizationApi;
+import com.ibm.mj.processmining.JobControlApi;
 import com.ibm.mj.processmining.ProcessInquiryManagementApi;
 import com.ibm.mj.processmining.model.*;
 import org.mj.process.model.generic.Attribute;
@@ -18,11 +19,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ProcessMiningService {
     private static final Logger logger = LoggerFactory.getLogger(ProcessMiningService.class);
-    
+
     public ApiClient getDefaultClient(ProcessMiningServer processMiningServer) {
         ApiClient defaultClient = new ApiClient();
         defaultClient.setBasePath(processMiningServer.getUrl());
@@ -81,13 +83,44 @@ public class ProcessMiningService {
         return project.getSuccess();
     }
 
+    public boolean checkJobStatus(String jobID, ApiClient apiClient) {
+        boolean completed = false;
+        boolean status = false;
+        try {
+            while (!completed) {
+                JobControlApi jobControlApi = new JobControlApi(apiClient);
+                StringResponse jobStatus = jobControlApi.getJobStatus(jobID, null, null, null);
+                if (jobStatus.getSuccess() == false) completed = true;
+                if (jobStatus.getData().equals("complete")) {
+                    completed = true;
+                    status = true;
+                } else if (jobStatus.getData().equals("in_progress")) {
+                    TimeUnit.MILLISECONDS.sleep(300);
+                } else {
+                    status = false;
+                }
+
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return status;
+    }
+
     public void createLog(String projectKey, String org, ApiClient apiClient, String[] headers, boolean augmented, String dateFormat) {
         ProcessInquiryManagementApi processInquiryManagementApi = new ProcessInquiryManagementApi(apiClient);
         Boolean forUpdate = true;
         String mapping = JSONTool.getMappingInfo(headers, augmented, dateFormat);
-        logger.info("Mapping details ");
-        logger.info(mapping);
+        logger.info("Create log for process mining started ");
+        logger.debug(mapping);
         StringResponse result = processInquiryManagementApi.performProcessMining(projectKey, org, null, null, null, forUpdate, mapping);
+        if (result.getSuccess()) {
+            logger.info("Wait for the create log job to finish");
+            checkJobStatus(result.getData(), apiClient);
+            logger.info("The create log job finished");
+        } else {
+            logger.warn("The create log job failed");
+        }
         logger.info("Result for the mapping " + result);
     }
 
@@ -95,7 +128,7 @@ public class ProcessMiningService {
     /*
      Upload the data for a project using a path
      */
-    public boolean uploadData(ApiClient apiClient, String projectID, String OrgID, String path, boolean append) {
+    public String uploadData(ApiClient apiClient, String projectID, String OrgID, String path, boolean append) {
         StringResponse result = new StringResponse();
         result.setSuccess(false);
         ProcessInquiryManagementApi processInquiryManagementApi = new ProcessInquiryManagementApi(apiClient);
@@ -107,6 +140,13 @@ public class ProcessMiningService {
         File _file = new File(path); // File |
         try {
             result = processInquiryManagementApi.uploadDataSet(projectKey, org, null, null, null, forUpdate, dataSetOverride, description, _file);
+            logger.info("Upload data " + result.getData());
+            if (result.getSuccess()) {
+                logger.info("Wait for the upload job to finish");
+                checkJobStatus(result.getData(), apiClient);
+                logger.info("Upload job finish");
+
+            }
         } catch (RestClientException e) {
             logger.error("Exception when calling ProcessInquiryManagementApi#uploadDataSet");
             logger.error("Status code: " + e.getMessage());
@@ -114,6 +154,6 @@ public class ProcessMiningService {
             logger.error("Response headers: " + e.getLocalizedMessage());
             e.printStackTrace();
         }
-        return result.getSuccess();
+        return result.getData();
     }
 }

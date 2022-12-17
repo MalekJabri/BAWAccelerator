@@ -8,15 +8,19 @@ import java.util.HashMap;
 @Data
 public class DataMining {
     boolean lowerCase;
-    boolean quote;
+    boolean removeG;
+    boolean addG;
+
     private HashMap<String, String> defaultAttributes;
     private String[] headers;
     private Iterable<CSVRecord> records;
 
-    public DataMining(boolean lCase, boolean quoteField) {
+    public DataMining(boolean lCase, boolean remove, boolean add) {
+
         defaultAttributes = new HashMap<>();
         lowerCase = lCase;
-        quote = quoteField;
+        removeG = remove;
+        addG = add;
         defaultAttributes.put(CaseEvent.START_TIME, getHeader(CaseEvent.START_TIME));
         defaultAttributes.put(CaseEvent.END_TIME, getHeader(CaseEvent.END_TIME));
         defaultAttributes.put(CaseEvent.CASE_TYPE, getHeader(CaseEvent.CASE_TYPE));
@@ -27,12 +31,14 @@ public class DataMining {
         defaultAttributes.put(CaseEvent.EVENT_REF_ID, getHeader(CaseEvent.EVENT_REF_ID));
         defaultAttributes.put(CaseEvent.EVENT_TYPE, getHeader(CaseEvent.EVENT_TYPE));
         defaultAttributes.put(CaseEvent.USER_NAME, getHeader(CaseEvent.USER_NAME));
+        System.out.println(defaultAttributes);
     }
 
     public String getHeader(String text) {
         String result = text;
         if (!lowerCase) result = result.toUpperCase();
-        if (quote) result = "\"" + result + "\"";
+        if (removeG) result = result.replaceAll("\"", "");
+        if (addG) result = "\"" + result + "\"";
         return result;
     }
 }

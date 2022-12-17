@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +42,7 @@ public class CaseServerPageController {
     }
 
     @PostMapping("/testConnection")
-    public String testConnection(HttpSession session, HttpServletResponse response, Model model, ConnectionRequest connectionRequest) {
+    public String testConnection(HttpSession session, Model model, ConnectionRequest connectionRequest) {
         DocumentRequest documentRequest = (DocumentRequest) session.getAttribute("documentRequest");
         ServerConfig serverConfig;
         try {
@@ -59,8 +58,8 @@ public class CaseServerPageController {
         try {
             DataProcessingService dataProcessingService = new DataProcessingService();
             DataMining dataMining = dataProcessingService.GetContentProcess(documentRequest.getFilePath(), documentRequest.getDelimiter());
-            CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
-            caseHistory.init(dataMining, documentRequest);
+            CaseHistory caseHistory = new CaseHistory();
+            caseHistory.analyse(dataMining, documentRequest);
             dataMining = null;
             logger.info("The number of case type found in the CSV is " + caseHistory.getCaseTypes().size());
             CaseTypeService caseTypeService = new CaseTypeService(serverConfig);

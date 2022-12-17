@@ -37,7 +37,7 @@ public class DataProcessingService {
         String delimiter = ",";
         DataMining dataMining = dataProcessingService.GetContentProcess(path, delimiter);
         String levelEvent = "Step";
-        CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
+        CaseHistory caseHistory = new CaseHistory();
         DocumentRequest documentRequest = new DocumentRequest();
         documentRequest.setEventLevel(levelEvent);
         documentRequest.setEncodedFormat("BASE64");
@@ -46,7 +46,7 @@ public class DataProcessingService {
         documentRequest.setCleanDate(true);
         documentRequest.setCleanIDAttribute(true);
         documentRequest.setCaseType("{E0BAC726-36D9-4BAB-A0AF-35478A5E9F93}");
-        caseHistory.init(dataMining, documentRequest);
+        caseHistory.analyse(dataMining, documentRequest);
         caseHistory.getCaseTypes().forEach((type, count) -> {
             logger.info("The case " + type + " with " + count + " events");
         });
@@ -56,7 +56,7 @@ public class DataProcessingService {
         if (documentRequest.getTargetDateFormat() != null && !documentRequest.getTargetDateFormat().isEmpty())
             dateFormat = documentRequest.getTargetDateFormat();
         caseHistory.augmentCaseDetails(properties, dateFormat, caseTypeService, false);
-        System.out.println(JSONTool.getMappingInfo(caseHistory.getHeaders(), true, documentRequest.getDateFormat()));
+        logger.info(JSONTool.getMappingInfo(caseHistory.getHeaders(), true, documentRequest.getDateFormat()));
         dataProcessingService.save(caseHistory, pathOut);
     }
 
@@ -64,22 +64,36 @@ public class DataProcessingService {
         boolean quote = false;
         boolean lowerCase = false;
         BufferedReader brTest = new BufferedReader(new FileReader(path));
-        String text = brTest.readLine();
+        String fistLine = brTest.readLine();
+        logger.finest(fistLine);
+        if (!fistLine.contains(delimiter)) {
+            throw new Exception(" Delimiter " + delimiter + " is not correct");
+        }
         String secondLine = brTest.readLine();
         brTest.close();
-        String[] strArray = text.split(delimiter + "");
+        String[] strArray = fistLine.split(delimiter + "");
         int pos = 0;
         if (strArray[0].startsWith("\"")) {
             quote = true;
             pos = 1;
         }
+        boolean startG = fistLine.startsWith("\"");
         lowerCase = Character.isLowerCase(strArray[0].charAt(pos));
-        DataMining dataMining = new DataMining(lowerCase, quote);
+        DataMining dataMining;
         Reader in = new FileReader(path);
-        if (secondLine.startsWith("\""))
-            dataMining.setRecords(CSVFormat.EXCEL.withDelimiter(delimiter.charAt(0)).withSkipHeaderRecord().withHeader(strArray).withQuote('”').parse(in));
-        else
+        if (secondLine.startsWith("\"")) {
+            logger.info("Extract using quote -->" + startG);
+            dataMining = new DataMining(lowerCase, false, startG);
+            logger.info("strArray : " + Arrays.toString(strArray));
+            logger.info("Headers " + dataMining.getDefaultAttributes());
+            dataMining.setRecords(CSVFormat.EXCEL.withDelimiter(delimiter.charAt(0)).withSkipHeaderRecord().withHeader(strArray).withQuote('"').parse(in));
+        } else {
+            logger.info("Extract without quote -->" + startG);
+            dataMining = new DataMining(lowerCase, false, startG);
+            logger.info("strArray : " + Arrays.toString(strArray));
+            logger.info("Headers " + dataMining.getDefaultAttributes());
             dataMining.setRecords(CSVFormat.EXCEL.withDelimiter(delimiter.charAt(0)).withSkipHeaderRecord().withHeader(strArray).parse(in));
+        }
         dataMining.setHeaders(strArray);
         return dataMining;
     }
@@ -88,23 +102,18 @@ public class DataProcessingService {
         logger.info("Start Writing the case event to the path " + path);
         AtomicInteger count = new AtomicInteger();
         FileWriter out = new FileWriter(path);
-        System.out.println("Number of evens :" + caseHistory.getEvents().size());
+        logger.info("Number of evens :" + caseHistory.getEvents().size());
         List<String> result = caseHistory.getEvents().get(caseHistory.getEvents().keySet().iterator().next()).getHeaders();
         String[] myheaders = result.toArray(new String[0]);
         try {
             CSVPrinter printer = new CSVPrinter(out, CSVFormat.EXCEL.withDelimiter(';').withHeader(myheaders));
             caseHistory.getEvents().forEach((id, caseEvent) -> {
-
                 try {
-
                     if (myheaders.length != caseEvent.getValues().size()) {
-                        System.out.println("Difference header ");
-                        System.out.println(Arrays.toString(myheaders));
-                        System.out.println(caseEvent.getHeaders());
-                        System.out.println();
+                        logger.info("Difference header ");
+                        logger.info(Arrays.toString(myheaders));
+                        logger.info("" + caseEvent.getHeaders());
                     }
-
-
                     printer.printRecord(caseEvent.getValues());
                     count.getAndIncrement();
                 } catch (IOException e) {

@@ -16,39 +16,65 @@ import java.util.logging.Logger;
 public class CaseHistory {
 
     private static Logger logger = Logger.getLogger(CaseHistory.class.getName());
-    private String[] head;
+    int eventCount = 0;
+    int levelCount = 0;
+    HashMap<String, Integer> eventDetails;
 
     private HashMap<String, CaseEvent> events;
     private HashMap<String, Integer> caseTypes;
 
-    public CaseHistory(String[] headers) {
-        head = headers;
+    public CaseHistory() {
+
     }
 
-    public void init(DataMining dataMining, DocumentRequest config) {
+    public void analyse(DataMining dataMining, DocumentRequest config) {
+        eventCount = 0;
+        levelCount = 0;
+        eventDetails = new HashMap<>();
+        CaseEvent newCaseEvent = null;
         caseTypes = new HashMap<>();
         for (CSVRecord record : dataMining.getRecords()) {
-            CaseEvent newCaseEvent = new CaseEvent(record, dataMining.getDefaultAttributes(), config.getDateFormat(), config.getTargetDateFormat());
-            if (newCaseEvent.getEventType().equals(config.getEventLevel())) {
+            newCaseEvent = new CaseEvent(record, dataMining.getDefaultAttributes(), config.getDateFormat(), config.getTargetDateFormat(), config.cleanIDAttribute);
+            if (eventDetails.containsKey(newCaseEvent.getEventType())) {
+                eventDetails.replace(newCaseEvent.getEventType(), eventDetails.get(newCaseEvent.getEventType()) + 1);
+            } else {
+                eventDetails.put(newCaseEvent.getEventType(), 1);
+            }
+            if (newCaseEvent.getEventType().replace("\"", "").equals(config.getEventLevel())) {
                 if (caseTypes.containsKey(newCaseEvent.getCaseType())) {
                     caseTypes.replace(newCaseEvent.getCaseType(), (caseTypes.get(newCaseEvent.getCaseType())) + 1);
                 } else {
+                    logger.info("New case type found " + newCaseEvent.getCaseType());
                     caseTypes.put(newCaseEvent.getCaseType(), 1);
                 }
             }
+            eventCount++;
         }
+        logger.info("sample case event " + newCaseEvent.getAdditionalAttribute());
+        logger.info("sample case event " + newCaseEvent.getCaseType());
+        logger.info("The number of events is  " + eventCount);
+        logger.info("The number of events per level " + eventDetails);
+        logger.info("The number of events per case type is  " + caseTypes);
     }
 
     public void processData(DataMining dataMining, DocumentRequest config) {
+        String contentHeader = null;
+        for (String header : dataMining.getHeaders()) {
+            if (header.contains(dataMining.getHeader(CaseEvent.CONTENT))) {
+                logger.info("Header content info " + header);
+                contentHeader = header;
+                break;
+            }
+        }
+        logger.info("Review Header -- 2");
+        logger.info("List of defaultAttributes : " + dataMining.getDefaultAttributes());
         String dateFormat = config.getDateFormat();
         if (config.getTargetDateFormat() != null && !config.getTargetDateFormat().isEmpty())
             dateFormat = config.getTargetDateFormat();
         events = new HashMap<>();
         CaseEvent newCaseEvent = null;
-        logger.info("The number of element in the csv");
-        System.out.println("Has next " + dataMining.getRecords().iterator().hasNext());
         for (CSVRecord record : dataMining.getRecords()) {
-            newCaseEvent = new CaseEvent(record, dataMining.getDefaultAttributes(), config.getDateFormat(), config.getTargetDateFormat());
+            newCaseEvent = new CaseEvent(record, dataMining.getDefaultAttributes(), config.getDateFormat(), config.getTargetDateFormat(), config.cleanIDAttribute);
             if (newCaseEvent.getCaseType().equals(config.getCaseType()) && newCaseEvent.getEventType().equals(config.getEventLevel())) {
                 if (events.containsKey(newCaseEvent.getEventEntityId())) {
                     CaseEvent oldCase = events.get(newCaseEvent.getEventEntityId());
@@ -58,17 +84,17 @@ public class CaseHistory {
                         oldCase.setStatus("COMPLETION");
                         oldCase.setEnd_time(newCaseEvent.getEnd_time());
                     }
-                    if (record.get(dataMining.getHeader(CaseEvent.CONTENT)) != null) {
-                        oldCase.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(dataMining.getHeader(CaseEvent.CONTENT)), config.getEncodedFormat(), dateFormat));
+                    if (contentHeader != null && record.get(contentHeader) != null) {
+                        oldCase.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(contentHeader), config.getEncodedFormat(), dateFormat));
                     }
                     if (newCaseEvent.getStatus().equals("START_WORKING")) {
-
                         oldCase.getAdditionalAttribute().put(dataMining.getHeader("START_WORKING"), newCaseEvent.getStart_time());
                     }
                     events.replace(oldCase.getEventEntityId(), oldCase);
                 } else {
-                    if (record.get(dataMining.getHeader(CaseEvent.CONTENT)) != null) {
-                        newCaseEvent.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(dataMining.getHeader(CaseEvent.CONTENT)), config.getEncodedFormat(), dateFormat));
+
+                    if (contentHeader != null && record.get(contentHeader) != null) {
+                        newCaseEvent.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(contentHeader), config.getEncodedFormat(), dateFormat));
                     }
                     events.put(newCaseEvent.getEventEntityId(), newCaseEvent);
 

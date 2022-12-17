@@ -56,20 +56,21 @@ public class ConfigurationPageController {
         DocumentRequest documentRequest = (DocumentRequest) session.getAttribute("documentRequest");
         ConnectionRequest connectionRequest = (ConnectionRequest) session.getAttribute("connectionRequest");
         CaseTypeService caseTypeService = null;
-        if (connectionRequest != null) {
+        if (documentRequest.isAddInformation() && connectionRequest != null) {
             ServerConfig serverConfig = new ServerConfig(connectionRequest.getBawContentServer());
             caseTypeService = new CaseTypeService(serverConfig);
+            logger.info("Case type selected " + configurationRequest.getCaseType());
             CaseType caseType = caseTypeService.getCaseTypeByName(configurationRequest.getCaseType());
             documentRequest.setCaseType(caseType.getId().toString());
         } else {
             documentRequest.setCaseType(configurationRequest.getCaseType());
         }
-        logger.info("teh case type is the following : " + documentRequest.getCaseType());
+        logger.info("The case type is the following :" + documentRequest.getCaseType());
         try {
             logger.info("Preparation CSV Started");
             DataProcessingService dataProcessingService = new DataProcessingService();
             DataMining dataMining = dataProcessingService.GetContentProcess(documentRequest.getFilePath(), documentRequest.getDelimiter());
-            CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
+            CaseHistory caseHistory = new CaseHistory();
             caseHistory.processData(dataMining, documentRequest);
             logger.info("The case type " + configurationRequest.getCaseType() + " has " + caseHistory.getEvents().size() + " events");
             if (documentRequest.isAddInformation() && configurationRequest.getProperties() != null && configurationRequest.getProperties().length > 0) {

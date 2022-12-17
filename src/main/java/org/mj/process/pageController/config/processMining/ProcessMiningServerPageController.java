@@ -91,11 +91,13 @@ public class ProcessMiningServerPageController {
             if (configPMProject.getUploadData() && processInfo != null) {
                 String finalDoc = (String) session.getAttribute("finalDoc");
                 processMiningService.uploadData(apiClient, processInfo.getProjectName(), configPMProject.getOrgID(), finalDoc, configPMProject.getAppend());
+
                 String[] headers = (String[]) session.getAttribute("headerCSV");
-                if (headers != null && headers.length > 0)
+                if (headers != null && headers.length > 0) {
                     logger.info("Map field to process mining");
-                logger.info("Header to map " + Arrays.toString(headers));
-                processMiningService.createLog(processInfo.getProjectName(), processInfo.getOrganization(), apiClient, headers, documentRequest.isAddInformation(), dateFormat);
+                    logger.info("Header to map " + Arrays.toString(headers));
+                    processMiningService.createLog(processInfo.getProjectName(), processInfo.getOrganization(), apiClient, headers, documentRequest.isAddInformation(), dateFormat);
+                }
             }
             logger.info("Creation for the project :" + configPMProject.getProjectName() + "-->" + projectSuccess);
         } catch (Exception e) {

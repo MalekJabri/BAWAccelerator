@@ -6,6 +6,7 @@ import org.mj.process.model.DataMining;
 import org.mj.process.model.DocumentRequest;
 import org.mj.process.model.generic.Attribute;
 import org.mj.process.model.servers.ConnectionRequest;
+import org.mj.process.pageController.config.baw.CaseServerPageController;
 import org.mj.process.service.ContentService;
 import org.mj.process.service.DataProcessingService;
 import org.mj.process.service.LocalPropertiesTools;
@@ -75,7 +76,7 @@ public class UploadPageController {
             logger.info("Download the file and save it to a path: " + path);
             documentRequest.setFilePath(ContentService.storeDocument("test", document, path, "csv"));
         } else if (documentRequest.getFilePath() == null || documentRequest.getFilePath().isEmpty()) {
-            model.addAttribute("csvImport", getDocumentRequest());
+            model.addAttribute("csvImport", documentRequest);
             model.addAttribute("Levels", getEventsType());
             model.addAttribute("message", "Please complete the path or add a file");
             model.addAttribute("classAlert", "alert alert-warning");
@@ -85,16 +86,16 @@ public class UploadPageController {
         try {
             DataProcessingService dataProcessingService = new DataProcessingService();
             DataMining dataMining = dataProcessingService.GetContentProcess(documentRequest.getFilePath(), documentRequest.getDelimiter());
-            CaseHistory caseHistory = new CaseHistory(dataMining.getHeaders());
+            CaseHistory caseHistory = new CaseHistory();
             System.out.println(Arrays.toString(dataMining.getHeaders()));
-            caseHistory.init(dataMining, documentRequest);
+            caseHistory.analyse(dataMining, documentRequest);
             caseTypes = caseHistory.getCaseAttribute();
             dataMining = null;
         } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("csvImport", getDocumentRequest());
+            model.addAttribute("csvImport", documentRequest);
             model.addAttribute("Levels", getEventsType());
-            model.addAttribute("message", "Issue with the file! please check the logs : " + e.getLocalizedMessage());
+            model.addAttribute("message", "Issue with the CSV! please check the logs : " + e.getLocalizedMessage());
             model.addAttribute("classAlert", "alert alert-warning");
             model.addAttribute("displayMessage", "");
             return "uploadDocument";
@@ -105,8 +106,9 @@ public class UploadPageController {
             ConnectionRequest connectionRequest;
             if (initValue) {
                 connectionRequest = propertiesTools.getConnectionRequest();
+                CaseServerPageController caseServerPageController = new CaseServerPageController();
+                return caseServerPageController.testConnection(session, model, connectionRequest);
             } else connectionRequest = new ConnectionRequest();
-
             model.addAttribute("connectionRequest", connectionRequest);
             model.addAttribute("message", "Upload has been done correctly");
             model.addAttribute("classAlert", "alert alert-success");
