@@ -7,6 +7,8 @@ import org.mj.process.model.CaseEvent;
 import org.mj.process.model.CaseHistory;
 import org.mj.process.model.MappingAttributePM;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,7 +27,14 @@ public class Sandbox {
         Sandbox sandbox = new Sandbox();
         sandbox.getHistory(caseInstance);*/
         String[] headers = {CaseEvent.EVENT_REF_ID, CaseEvent.CASE_ID, CaseEvent.END_TIME};
-        System.out.println(getMappingInfo(headers, false));
+
+        String dateFormat = "yyyy-MM-dd HH:mm:ss";
+        String testDate = "2012-09-15 21:20:15";
+        SimpleDateFormat orignalFormat = new SimpleDateFormat(dateFormat);
+        Date eventDate = orignalFormat.parse(testDate);
+        System.out.println("event date " + eventDate);
+        System.out.println("converted  date " + orignalFormat.format(eventDate));
+        //  System.out.println(getMappingInfo(headers, false));
     }
 
     public static String getMappingInfo(String[] headers, boolean augmented) {

@@ -41,3 +41,5 @@ build/
 *.csv
 /config.properties
 /connection.properties
+*.trc
+javacore.20221217.013642.6084.0002.txt

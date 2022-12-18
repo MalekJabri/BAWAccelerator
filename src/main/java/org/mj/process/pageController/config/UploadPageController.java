@@ -57,11 +57,11 @@ public class UploadPageController {
         DocumentRequest documentRequest = new DocumentRequest();
         if (initValue) {
             documentRequest.setFilePath("/Users/jabrimalek/Project/lalux/BAW_DATA/CH_CASEHIST.csv");
-            documentRequest.setDateFormat("dd/MM/yyyy hh:mm:ss");
+            documentRequest.setDateFormat("yyyy-MM-dd-hh.mm.ss");
             documentRequest.setDelimiter(",");
             documentRequest.setCleanDate(true);
             documentRequest.setCleanIDAttribute(true);
-            documentRequest.setAddInformation(true);
+            documentRequest.setAddInformation(false);
             documentRequest.setEncodedFormat("BASE64");
         }
         return documentRequest;
@@ -103,12 +103,13 @@ public class UploadPageController {
         // Complete the variables
         session.setAttribute("documentRequest", documentRequest);
         if (documentRequest.isAddInformation()) {
-            ConnectionRequest connectionRequest;
+            ConnectionRequest connectionRequest = new ConnectionRequest();
             if (initValue) {
                 connectionRequest = propertiesTools.getConnectionRequest();
                 CaseServerPageController caseServerPageController = new CaseServerPageController();
-                return caseServerPageController.testConnection(session, model, connectionRequest);
-            } else connectionRequest = new ConnectionRequest();
+                if (connectionRequest.getBawContentServer() != null)
+                    return caseServerPageController.testConnection(session, model, connectionRequest);
+            }
             model.addAttribute("connectionRequest", connectionRequest);
             model.addAttribute("message", "Upload has been done correctly");
             model.addAttribute("classAlert", "alert alert-success");

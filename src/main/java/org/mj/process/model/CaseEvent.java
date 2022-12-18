@@ -35,19 +35,18 @@ public class CaseEvent {
     public CaseEvent(CSVRecord record, HashMap<String, String> defaultAttributes, String dateFormat, String targetDateFormat, boolean cleanID) {
         additionalAttribute = new HashMap<>();
         defaultAttributes.forEach((key, storedKey) -> {
-            if (key.contains("TIME") || key.contains("time")) {
+
+            if (key.toLowerCase().contains("time")) {
                 String date = cleanDate(record.get(storedKey), dateFormat, targetDateFormat);
-                System.out.println(key + " -- " + date);
                 additionalAttribute.put(key, date);
-            }
-            if ((key.contains("id") || key.contains("ID")) && cleanID) {
+            } else if ((key.toLowerCase().contains("_id")) && cleanID) {
                 String value = record.get(storedKey);
                 value = value.replace("{", "");
                 value = value.replace("}", "");
                 additionalAttribute.put(key, value);
+
             } else {
                 additionalAttribute.put(key, record.get(storedKey));
-
             }
         });
     }
@@ -75,6 +74,7 @@ public class CaseEvent {
         String wrongDate = "31/12/9999 23:59:59";
         String defaultFormat = "dd/MM/yyyy hh:mm:ss";
         String result = date;
+        if (result.contains("9999")) return "";
         Date eventDate;
         SimpleDateFormat orignalFormat = new SimpleDateFormat(dateFormat);
         try {

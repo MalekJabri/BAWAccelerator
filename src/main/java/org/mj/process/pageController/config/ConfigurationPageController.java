@@ -34,8 +34,14 @@ public class ConfigurationPageController {
     @PostMapping(value = "/configuration", params = "action=generate")
     public String generateFile(HttpSession session, Model model, ConfigurationRequest configurationRequest) {
         logger.info("Generate file " + configurationRequest);
-        preparationCSV(session, configurationRequest);
-        model.addAttribute("message", "Configuration review");
+        try {
+            preparationCSV(session, configurationRequest);
+        } catch (Exception e) {
+            model.addAttribute("message", "Generation partially failed due to " + e.getMessage());
+            model.addAttribute("classAlert", "alert alert-warning");
+            model.addAttribute("displayMessage", "");
+        }
+        model.addAttribute("message", "Generation of the document has been completed");
         model.addAttribute("classAlert", "alert alert-success");
         model.addAttribute("displayMessage", "");
         return "download";
@@ -45,14 +51,20 @@ public class ConfigurationPageController {
     public String publish(HttpSession session, Model model, ConfigurationRequest configurationRequest) {
         logger.info("Publish " + configurationRequest);
 
-        preparationCSV(session, configurationRequest);
-        model.addAttribute("message", "Configuration review");
+        try {
+            preparationCSV(session, configurationRequest);
+        } catch (Exception e) {
+            model.addAttribute("message", "Generation partially failed due to " + e.getMessage());
+            model.addAttribute("classAlert", "alert alert-warning");
+            model.addAttribute("displayMessage", "");
+        }
+        model.addAttribute("message", "Generation of the document has been completed");
         model.addAttribute("classAlert", "alert alert-success");
         model.addAttribute("displayMessage", "");
         return "redirect:/setProcessMiningServer";
     }
 
-    private void preparationCSV(HttpSession session, ConfigurationRequest configurationRequest) {
+    private void preparationCSV(HttpSession session, ConfigurationRequest configurationRequest) throws Exception {
         DocumentRequest documentRequest = (DocumentRequest) session.getAttribute("documentRequest");
         ConnectionRequest connectionRequest = (ConnectionRequest) session.getAttribute("connectionRequest");
         CaseTypeService caseTypeService = null;
@@ -66,33 +78,30 @@ public class ConfigurationPageController {
             documentRequest.setCaseType(configurationRequest.getCaseType());
         }
         logger.info("The case type is the following :" + documentRequest.getCaseType());
-        try {
-            logger.info("Preparation CSV Started");
-            DataProcessingService dataProcessingService = new DataProcessingService();
-            DataMining dataMining = dataProcessingService.GetContentProcess(documentRequest.getFilePath(), documentRequest.getDelimiter());
-            CaseHistory caseHistory = new CaseHistory();
-            caseHistory.processData(dataMining, documentRequest);
-            logger.info("The case type " + configurationRequest.getCaseType() + " has " + caseHistory.getEvents().size() + " events");
-            if (documentRequest.isAddInformation() && configurationRequest.getProperties() != null && configurationRequest.getProperties().length > 0) {
-                String dateFormat = documentRequest.getDateFormat();
-                if (documentRequest.getTargetDateFormat() != null && !documentRequest.getTargetDateFormat().isEmpty())
-                    dateFormat = documentRequest.getTargetDateFormat();
-                logger.info("Add Additional information from BAW Server");
-                List<String> properties = new ArrayList<>();
-                for (String prop : configurationRequest.getProperties()) properties.add(prop);
-                properties.add("CmAcmCaseIdentifier");
-                caseHistory.augmentCaseDetails(properties, dateFormat, caseTypeService, false);
-                logger.info("The number of event is " + caseHistory.getEvents().size());
-            }
-            dataProcessingService.save(caseHistory, path + "-compiled" + ".csv");
-            session.setAttribute("headerCSV", caseHistory.getHeaders());
-            session.setAttribute("finalDoc", path + "-compiled" + ".csv");
-            dataMining = null;
-            logger.info("Preparation CSV ended");
-        } catch (Exception e) {
-            logger.warning("Message: " + e.getMessage());
-            e.printStackTrace();
+
+        logger.info("Preparation CSV Started");
+        DataProcessingService dataProcessingService = new DataProcessingService();
+        DataMining dataMining = dataProcessingService.GetContentProcess(documentRequest.getFilePath(), documentRequest.getDelimiter());
+        CaseHistory caseHistory = new CaseHistory();
+        caseHistory.processData(dataMining, documentRequest);
+        logger.info("The case type " + configurationRequest.getCaseType() + " has " + caseHistory.getEvents().size() + " events");
+        if (documentRequest.isAddInformation() && configurationRequest.getProperties() != null && configurationRequest.getProperties().length > 0) {
+            String dateFormat = documentRequest.getDateFormat();
+            if (documentRequest.getTargetDateFormat() != null && !documentRequest.getTargetDateFormat().isEmpty())
+                dateFormat = documentRequest.getTargetDateFormat();
+            logger.info("Add Additional information from BAW Server");
+            List<String> properties = new ArrayList<>();
+            for (String prop : configurationRequest.getProperties()) properties.add(prop);
+            properties.add("CmAcmCaseIdentifier");
+            caseHistory.augmentCaseDetails(properties, dateFormat, caseTypeService, false);
+            logger.info("The number of event is " + caseHistory.getEvents().size());
         }
+        dataProcessingService.save(caseHistory, path + "-compiled" + ".csv");
+        session.setAttribute("headerCSV", caseHistory.getHeaders());
+        session.setAttribute("finalDoc", path + "-compiled" + ".csv");
+        dataMining = null;
+        logger.info("Preparation CSV ended");
+
     }
 
 

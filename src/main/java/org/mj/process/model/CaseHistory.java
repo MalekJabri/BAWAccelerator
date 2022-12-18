@@ -27,9 +27,18 @@ public class CaseHistory {
 
     }
 
-    public void analyse(DataMining dataMining, DocumentRequest config) {
+    public void analyse(DataMining dataMining, DocumentRequest config) throws Exception {
         eventCount = 0;
         levelCount = 0;
+        boolean testedxml = false;
+        String contentHeader = null;
+        for (String header : dataMining.getHeaders()) {
+            if (header.contains(dataMining.getHeader(CaseEvent.CONTENT))) {
+                logger.info("Header content info " + header);
+                contentHeader = header;
+                break;
+            }
+        }
         eventDetails = new HashMap<>();
         CaseEvent newCaseEvent = null;
         caseTypes = new HashMap<>();
@@ -48,6 +57,10 @@ public class CaseHistory {
                     caseTypes.put(newCaseEvent.getCaseType(), 1);
                 }
             }
+            if (contentHeader != null && record.get(contentHeader) != null && !testedxml) {
+                newCaseEvent.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(contentHeader), config.getEncodedFormat(), config.getDateFormat()));
+                testedxml = true;
+            }
             eventCount++;
         }
         logger.info("sample case event " + newCaseEvent.getAdditionalAttribute());
@@ -57,7 +70,8 @@ public class CaseHistory {
         logger.info("The number of events per case type is  " + caseTypes);
     }
 
-    public void processData(DataMining dataMining, DocumentRequest config) {
+    public String processData(DataMining dataMining, DocumentRequest config) {
+        String message = null;
         String contentHeader = null;
         for (String header : dataMining.getHeaders()) {
             if (header.contains(dataMining.getHeader(CaseEvent.CONTENT))) {
@@ -85,7 +99,12 @@ public class CaseHistory {
                         oldCase.setEnd_time(newCaseEvent.getEnd_time());
                     }
                     if (contentHeader != null && record.get(contentHeader) != null) {
-                        oldCase.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(contentHeader), config.getEncodedFormat(), dateFormat));
+                        try {
+                            oldCase.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(contentHeader), config.getEncodedFormat(), dateFormat));
+                        } catch (Exception e) {
+                            message = e.getMessage();
+                            logger.severe(e.getMessage());
+                        }
                     }
                     if (newCaseEvent.getStatus().equals("START_WORKING")) {
                         oldCase.getAdditionalAttribute().put(dataMining.getHeader("START_WORKING"), newCaseEvent.getStart_time());
@@ -94,15 +113,22 @@ public class CaseHistory {
                 } else {
 
                     if (contentHeader != null && record.get(contentHeader) != null) {
-                        newCaseEvent.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(contentHeader), config.getEncodedFormat(), dateFormat));
+                        try {
+                            newCaseEvent.getAdditionalAttribute().putAll(XmlParserTool.getPropertiesFromXML(record.get(contentHeader), config.getEncodedFormat(), dateFormat));
+                        } catch (Exception e) {
+                            message = e.getMessage();
+                            logger.severe(e.getMessage());
+                        }
                     }
                     events.put(newCaseEvent.getEventEntityId(), newCaseEvent);
 
                 }
             }
         }
+        logger.info("newCaseEvent " + newCaseEvent);
         logger.info("The process is done with " + events.size() + " events");
         logger.info("The header is composed " + newCaseEvent.getHeaders() + "");
+        return message;
     }
 
     public void augmentCaseDetails(List<String> properties, String format, CaseTypeService caseTypeService, boolean displayName) {

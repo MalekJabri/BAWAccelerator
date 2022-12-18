@@ -172,7 +172,8 @@
                             <hr class="mb-4">
                             <div class="row">
                                 <div class="col-md-12 ">
-                                    <button class="btn btn-primary" onclick="showSpinner()" type="submit"><i
+                                    <button class="btn btn-primary" data-target="#generateCSVModalCenter"
+                                            data-toggle="modal" type="submit"><i
                                             class="fa fa-upload" style="padding-right: 5px"></i> Upload & Analyse the
                                         file
                                     </button>
@@ -205,8 +206,28 @@
                 </li>
             </script>
         </div>
-    </div>
 
+    </div>
+    <div aria-hidden="true" aria-labelledby="generateCSVModalCenterTitle" class="modal fade"
+         id="generateCSVModalCenter"
+         role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="generateCSVModalLongTitle">Analyse of the CSV</h5>
+                </div>
+                <div class="modal-body">
+                    The CSV is under review.
+                    <p></p>
+                    Please wait !!!.
+                    <p></p>
+                    <img src="/assets/img/selsel-spin.gif"
+                         style="width: 50%; display: block;margin-left: auto; margin-right: auto; ">
+                </div>
+
+            </div>
+        </div>
+    </div>
     <footer class="my-5 pt-5 text-muted text-center text-small">
         <div class="row" style="margin-bottom: 20px; margin-top: 20px">
             <div class="col-md-12 " style="margin-top: 10px">

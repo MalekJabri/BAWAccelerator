@@ -1,7 +1,5 @@
 package org.mj.process.pageController.config;
 
-import org.mj.process.pageController.config.baw.CaseServerPageController;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -22,11 +20,10 @@ import java.nio.file.Paths;
 import java.util.logging.Logger;
 
 @Controller
-public class GeneratePageController {
+public class DownloadPageController {
 
-    private static Logger logger = Logger.getLogger(CaseServerPageController.class.getName());
-    @Value("${spring.servlet.multipart.location}")
-    private String pathDocument;
+    private static Logger logger = Logger.getLogger(DownloadPageController.class.getName());
+
 
     @GetMapping("/download")
     public ResponseEntity downloadFileFromLocal(HttpSession session) throws FileNotFoundException, MalformedURLException {
