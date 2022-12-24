@@ -7,6 +7,7 @@ import org.mj.process.model.CaseEvent;
 import org.mj.process.model.CaseHistory;
 import org.mj.process.model.MappingAttributePM;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +27,22 @@ public class Sandbox {
         Case caseInstance = caseTypeService.getCase(caseId, null);
         Sandbox sandbox = new Sandbox();
         sandbox.getHistory(caseInstance);*/
+
+        //  System.out.println(getMappingInfo(headers, false));
+        System.out.println("LastModificationDate");
+        printDate("1573184152000");
+        printDate("1573170280000");
+        printDate("1573170297000");
+        printDate("1573170297000");
+    }
+
+    public static void printDate(String text) {
+        Date eventDate = new Date(Long.parseLong(text));
+        System.out.println(eventDate);
+    }
+
+
+    private static void formattingTest() throws ParseException {
         String[] headers = {CaseEvent.EVENT_REF_ID, CaseEvent.CASE_ID, CaseEvent.END_TIME};
 
         String dateFormat = "yyyy-MM-dd HH:mm:ss";
@@ -34,7 +51,6 @@ public class Sandbox {
         Date eventDate = orignalFormat.parse(testDate);
         System.out.println("event date " + eventDate);
         System.out.println("converted  date " + orignalFormat.format(eventDate));
-        //  System.out.println(getMappingInfo(headers, false));
     }
 
     public static String getMappingInfo(String[] headers, boolean augmented) {

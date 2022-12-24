@@ -96,9 +96,10 @@ public class ConfigurationPageController {
             caseHistory.augmentCaseDetails(properties, dateFormat, caseTypeService, false);
             logger.info("The number of event is " + caseHistory.getEvents().size());
         }
-        dataProcessingService.save(caseHistory, path + "-compiled" + ".csv");
+        String pathComposed = documentRequest.getFilePath().replace(".csv", "-compiled.csv");
+        dataProcessingService.save(caseHistory, pathComposed);
         session.setAttribute("headerCSV", caseHistory.getHeaders());
-        session.setAttribute("finalDoc", path + "-compiled" + ".csv");
+        session.setAttribute("finalDoc", pathComposed);
         dataMining = null;
         logger.info("Preparation CSV ended");
 

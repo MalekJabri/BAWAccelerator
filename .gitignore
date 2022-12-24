@@ -43,3 +43,4 @@ build/
 /connection.properties
 *.trc
 javacore.20221217.013642.6084.0002.txt
+config1.properties
